@@ -5,31 +5,5 @@
   "author": {
     "name": "Ciaran Roche",
     "email": "croche@redhat.com"
-  },
-  "commands": [
-    "duck",
-    "review",
-    "research",
-    "brainstorm",
-    "pr-create",
-    "pr-status",
-    "issues",
-    "gh-actions",
-    "my-sprint",
-    "my-tasks",
-    "new-comments",
-    "sprint-status",
-    "triage"
-  ],
-  "skills": [
-    "ghostwriter",
-    "pair-programmer",
-    "jira-ticket-creator",
-    "jira-story-pointer",
-    "jira-triage"
-  ],
-  "agents": [
-    "reviewer",
-    "researcher"
-  ]
+  }
 }
