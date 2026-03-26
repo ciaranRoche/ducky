@@ -1,0 +1,14 @@
+{
+  "name": "ducky",
+  "owner": {
+    "name": "Ciaran Roche",
+    "email": "croche@redhat.com"
+  },
+  "plugins": [
+    {
+      "name": "ducky",
+      "source": "./ducky",
+      "description": "Personal AI pair programming toolkit — rubber duck debugging, PR reviews, brainstorming, research, JIRA, and GitHub ops in your writing style"
+    }
+  ]
+}

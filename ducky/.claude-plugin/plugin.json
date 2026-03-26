@@ -1,0 +1,35 @@
+{
+  "name": "ducky",
+  "version": "0.1.0",
+  "description": "Personal AI pair programming toolkit — rubber duck debugging, PR reviews, brainstorming, research, JIRA, and GitHub ops in your writing style",
+  "author": {
+    "name": "Ciaran Roche",
+    "email": "croche@redhat.com"
+  },
+  "commands": [
+    "duck",
+    "review",
+    "research",
+    "brainstorm",
+    "pr-create",
+    "pr-status",
+    "issues",
+    "gh-actions",
+    "my-sprint",
+    "my-tasks",
+    "new-comments",
+    "sprint-status",
+    "triage"
+  ],
+  "skills": [
+    "ghostwriter",
+    "pair-programmer",
+    "jira-ticket-creator",
+    "jira-story-pointer",
+    "jira-triage"
+  ],
+  "agents": [
+    "reviewer",
+    "researcher"
+  ]
+}
