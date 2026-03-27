@@ -1,4 +1,5 @@
 ---
+name: pr-status
 description: Check status of a PR - CI, reviews, merge readiness
 allowed-tools: Bash
 argument-hint: [PR-URL-or-number]

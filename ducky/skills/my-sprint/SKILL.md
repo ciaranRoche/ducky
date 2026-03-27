@@ -1,4 +1,5 @@
 ---
+name: my-sprint
 description: Show current sprint and your assigned tasks
 allowed-tools: Bash
 ---

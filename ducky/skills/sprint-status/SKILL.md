@@ -1,4 +1,5 @@
 ---
+name: sprint-status
 description: Sprint health overview for team leads - progress, blockers, and risks
 allowed-tools: Bash
 argument-hint: [project-key]

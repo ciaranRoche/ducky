@@ -6,12 +6,11 @@ Personal AI pair programming toolkit for Claude Code. Rubber duck debugging, PR 
 
 A Claude Code plugin that bundles:
 
-- **Commands** (`/review`, `/research`, `/brainstorm`, etc.) for quick interactive workflows
-- **Skills** (ghostwriter, pair-programmer, JIRA ticket creator, etc.) for reusable capabilities
+- **Skills** (`/review`, `/research`, `/brainstorm`, ghostwriter, pair-programmer, etc.) for interactive workflows and reusable capabilities
 - **Agents** (researcher) for autonomous multi-step tasks
 - **MCP integration** with Qdrant for writing style RAG
 
-The ghostwriter skill is the backbone. It defines a personal writing style that other commands and agents reference, so all generated output sounds like you.
+The ghostwriter skill is the backbone. It defines a personal writing style that other skills and agents reference, so all generated output sounds like you.
 
 ## Prerequisites
 
@@ -40,10 +39,12 @@ If using the writing style RAG:
 2. The `mcp-server-qdrant` server is configured in `.mcp.json`
 3. Store writing samples with the `qdrant-store` tool to build your style corpus
 
-## Commands
+## Skills
 
-| Command | Description |
-|---------|-------------|
+### Slash Commands
+
+| Skill | Description |
+|-------|-------------|
 | `/duck [topic]` | Rubber duck debugging via Socratic questioning |
 | `/review [PR]` | Review a PR with feedback in your writing style |
 | `/pr-create [base]` | Create a PR with a well-structured description |
@@ -58,7 +59,7 @@ If using the writing style RAG:
 | `/sprint-status` | Sprint health overview for team leads |
 | `/triage [scope]` | Audit sprint tickets for completeness |
 
-## Skills
+### Background Skills
 
 | Skill | Description |
 |-------|-------------|

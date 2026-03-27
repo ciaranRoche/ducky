@@ -1,4 +1,5 @@
 ---
+name: my-tasks
 description: List all your assigned JIRA tasks in the current project
 allowed-tools: Bash
 ---

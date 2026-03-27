@@ -1,4 +1,5 @@
 ---
+name: gh-actions
 description: GitHub Actions - check workflow status, trigger runs, view logs
 allowed-tools: Bash
 argument-hint: [action]

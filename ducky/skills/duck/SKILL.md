@@ -1,4 +1,5 @@
 ---
+name: duck
 description: Rubber duck debugging session - think through problems via Socratic questioning
 allowed-tools: Bash, Glob, Grep, Read
 argument-hint: [topic or problem]

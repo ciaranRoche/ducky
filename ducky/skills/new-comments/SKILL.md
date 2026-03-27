@@ -1,4 +1,5 @@
 ---
+name: new-comments
 description: Find tickets with new comments you may have missed
 allowed-tools: Bash
 ---

@@ -1,4 +1,5 @@
 ---
+name: brainstorm
 description: Structured brainstorming session with thinking frameworks
 allowed-tools: Bash, WebSearch, WebFetch, mcp__writing-samples__qdrant-find
 argument-hint: [topic]

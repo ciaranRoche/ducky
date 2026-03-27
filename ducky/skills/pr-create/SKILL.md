@@ -1,4 +1,5 @@
 ---
+name: pr-create
 description: Create a PR with a well-structured description in your writing style
 allowed-tools: Bash, mcp__writing-samples__qdrant-find
 argument-hint: [base-branch]
