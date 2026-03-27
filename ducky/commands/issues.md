@@ -1,7 +1,8 @@
 ---
 description: GitHub issue management - create, search, comment, close, view
-allowed-tools: Bash
+allowed-tools: Bash, mcp__writing-samples__qdrant-find
 argument-hint: [action] [args]
+disable-model-invocation: true
 ---
 
 # GitHub Issues

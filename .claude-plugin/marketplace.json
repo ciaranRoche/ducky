@@ -1,5 +1,7 @@
 {
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "ducky",
+  "description": "Personal AI pair programming toolkit for Claude Code",
   "owner": {
     "name": "Ciaran Roche",
     "email": "croche@redhat.com"
@@ -8,7 +10,9 @@
     {
       "name": "ducky",
       "source": "./ducky",
-      "description": "Personal AI pair programming toolkit — rubber duck debugging, PR reviews, brainstorming, research, JIRA, and GitHub ops in your writing style"
+      "description": "Personal AI pair programming toolkit — rubber duck debugging, PR reviews, brainstorming, research, JIRA, and GitHub ops in your writing style",
+      "category": "productivity",
+      "keywords": ["pair-programming", "jira", "github", "code-review", "writing-style"]
     }
   ]
 }

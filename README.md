@@ -8,7 +8,7 @@ A Claude Code plugin that bundles:
 
 - **Commands** (`/review`, `/research`, `/brainstorm`, etc.) for quick interactive workflows
 - **Skills** (ghostwriter, pair-programmer, JIRA ticket creator, etc.) for reusable capabilities
-- **Agents** (researcher, reviewer) for autonomous multi-step tasks
+- **Agents** (researcher) for autonomous multi-step tasks
 - **MCP integration** with Qdrant for writing style RAG
 
 The ghostwriter skill is the backbone. It defines a personal writing style that other commands and agents reference, so all generated output sounds like you.
@@ -73,7 +73,6 @@ If using the writing style RAG:
 | Agent | Description |
 |-------|-------------|
 | **researcher** | Autonomous multi-source technical research |
-| **reviewer** | Autonomous PR review in your writing style |
 
 ## Customization
 

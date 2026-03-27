@@ -1,7 +1,8 @@
 ---
 description: Create a PR with a well-structured description in your writing style
-allowed-tools: Bash
+allowed-tools: Bash, mcp__writing-samples__qdrant-find
 argument-hint: [base-branch]
+disable-model-invocation: true
 ---
 
 # Create PR
@@ -19,14 +20,17 @@ Create a pull request with a well-structured description written in your persona
 # Current branch
 git branch --show-current
 
+# Resolve base branch once
+BASE=${1:-$(gh repo view --json defaultBranchRef --jq '.defaultBranchRef.name')}
+
 # Changes vs base
-git log --oneline $(git merge-base HEAD ${1:-$(gh repo view --json defaultBranchRef --jq '.defaultBranchRef.name')})..HEAD
+git log --oneline $(git merge-base HEAD $BASE)..HEAD
 
 # Diff stats
-git diff --stat ${1:-$(gh repo view --json defaultBranchRef --jq '.defaultBranchRef.name')}...HEAD
+git diff --stat $BASE...HEAD
 
 # Full diff for understanding
-git diff ${1:-$(gh repo view --json defaultBranchRef --jq '.defaultBranchRef.name')}...HEAD
+git diff $BASE...HEAD
 ```
 
 ### Step 2: Check for existing PR

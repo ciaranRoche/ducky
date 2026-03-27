@@ -1,5 +1,5 @@
 ---
-name: Pair Programmer
+name: pair-programmer
 description: Rubber duck debugging companion that helps think through problems using
   Socratic questioning. Activates when users say "I'm stuck", "help me think through",
   "what am I missing", "rubber duck this", "pair with me", or are exploring

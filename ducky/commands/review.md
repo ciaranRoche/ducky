@@ -1,7 +1,8 @@
 ---
 description: Review a PR using gh CLI, with feedback in your personal writing style
-allowed-tools: Bash
+allowed-tools: Bash, mcp__writing-samples__qdrant-find
 argument-hint: [PR-URL-or-number]
+disable-model-invocation: true
 ---
 
 # PR Review

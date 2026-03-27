@@ -1,11 +1,11 @@
 ---
-description: List all your assigned JIRA tasks across projects
+description: List all your assigned JIRA tasks in the current project
 allowed-tools: Bash
 ---
 
 # My Tasks
 
-Show all JIRA tickets currently assigned to the user.
+Show all JIRA tickets currently assigned to the user in the configured project.
 
 ## Instructions
 

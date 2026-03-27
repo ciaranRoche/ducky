@@ -5,10 +5,9 @@ Personal Claude Code plugin. Not a traditional codebase, just markdown configura
 ## Project Structure
 
 ```
-agents/          Autonomous agents (AGENT.md files)
+agents/          Autonomous agent (.md files)
 commands/        User-invoked slash commands (markdown files)
 skills/          Reusable capabilities referenced by commands and agents (SKILL.md files)
-.claude/         Claude Code settings
 .claude-plugin/  Plugin manifest
 .mcp.json        MCP server configuration (Qdrant for writing style RAG)
 ```

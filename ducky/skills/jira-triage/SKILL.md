@@ -1,5 +1,5 @@
 ---
-name: JIRA Ticket Triage
+name: jira-triage
 description: Validates JIRA tickets have required fields and quality standards for sprint planning.
 ---
 

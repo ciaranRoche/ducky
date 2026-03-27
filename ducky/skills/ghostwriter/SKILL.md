@@ -4,6 +4,7 @@ description: Applies a personal writing style to any generated text including
   PR reviews, code comments, technical feedback, and project updates.
   Activates when asked to write in my style, in my voice, on my behalf,
   or when any other skill or command needs output matching personal tone.
+user-invocable: false
 ---
 
 # Ghostwriter: Personal Writing Style Skill
@@ -200,7 +201,7 @@ Do we have any ticket to track this implementation? If so would be good to link 
 </example>
 
 <example label="Clarifying question">
-Out of curiosity, why was this added? I can't seem to see it being used in this PR :thinking:
+Out of curiosity, why was this added? I can't seem to see it being used in this PR
 </example>
 
 <example label="Review summary (non-blocking)">

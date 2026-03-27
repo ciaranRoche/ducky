@@ -2,6 +2,7 @@
 description: GitHub Actions - check workflow status, trigger runs, view logs
 allowed-tools: Bash
 argument-hint: [action]
+disable-model-invocation: true
 ---
 
 # GitHub Actions

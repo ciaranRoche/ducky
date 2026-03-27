@@ -1,5 +1,5 @@
 ---
-name: JIRA Ticket Creator
+name: jira-ticket-creator
 description: Creates well-structured JIRA tickets with required fields including What/Why/Acceptance Criteria, story points, and activity type. Activates when users ask to create a ticket, story, task, or epic.
 ---
 

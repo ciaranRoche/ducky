@@ -25,17 +25,17 @@ Comprehensive sprint health report for team leads and scrum masters.
 
 3. **Get tickets by status - To Do:**
    ```bash
-   jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND status = 'To Do'" --created-after "-30d" --plain 2>/dev/null
+   jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND status = 'To Do' AND sprint in openSprints()" --plain 2>/dev/null
    ```
 
 4. **Get tickets by status - In Progress:**
    ```bash
-   jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND status = 'In Progress'" --plain 2>/dev/null
+   jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND status = 'In Progress' AND sprint in openSprints()" --plain 2>/dev/null
    ```
 
 5. **Get tickets by status - Done (this sprint):**
    ```bash
-   jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND status = Done" --updated-after "-14d" --plain 2>/dev/null
+   jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND status = Done AND sprint in openSprints()" --plain 2>/dev/null
    ```
 
 6. **Find blockers (high priority not done):**

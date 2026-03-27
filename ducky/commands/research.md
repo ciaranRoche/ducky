@@ -1,6 +1,6 @@
 ---
 description: Deep research on a technical topic with synthesized findings
-allowed-tools: Bash, WebSearch, WebFetch, Glob, Grep, Read
+allowed-tools: Bash, WebSearch, WebFetch, Glob, Grep, Read, mcp__writing-samples__qdrant-find
 argument-hint: [topic]
 ---
 

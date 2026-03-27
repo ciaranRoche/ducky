@@ -2,6 +2,7 @@
 description: Audit sprint tickets for triage - required fields, components, and duplicate detection
 allowed-tools: Bash
 argument-hint: [scope: sprint|backlog|all]
+disable-model-invocation: true
 ---
 
 # Triage Check
