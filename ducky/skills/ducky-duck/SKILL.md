@@ -14,7 +14,7 @@ Start a rubber duck debugging session using the ducky-pair-programmer skill.
 
 ## Instructions
 
-Activate the **pair-programmer** skill and run a full session.
+Activate the **ducky-pair-programmer** skill and run a full session.
 
 ### Step 1: Set the context
 
