@@ -1,6 +1,6 @@
 ---
 name: review
-description: Review a PR using gh CLI, with feedback in your personal writing style
+description: Review a PR using a structured multi-pass approach with feedback in your personal writing style
 allowed-tools: Bash, mcp__writing-samples__qdrant-find
 argument-hint: [PR-URL-or-number]
 disable-model-invocation: true
@@ -8,148 +8,73 @@ disable-model-invocation: true
 
 # PR Review
 
-Review a pull request and provide feedback in your personal writing style.
+Review a pull request using a structured multi-pass approach. Each round has a focused cognitive frame and clear exit criteria to prevent review loops.
 
 ## Arguments
 - `$1` (optional): PR URL, number, or omit to auto-detect current branch's PR
 
-## Instructions
+## Review Pipeline
 
-### Step 1: Identify the PR
+This skill orchestrates 4 review rounds in sequence. Each round can also be invoked independently.
 
-```bash
-# If argument provided, use it directly
-# If no argument, detect PR for current branch
-gh pr view ${1:---json number,title,url} --json number,title,url,body,additions,deletions,changedFiles,author,baseRefName,headRefName,reviewDecision,statusCheckRollup 2>/dev/null
-```
+### Round 0: Triage (inline)
 
-If no PR found, inform the user and suggest `gh pr list`.
-
-### Step 2: Fetch the diff and existing review comments
+Before reading any code, classify the PR to determine review depth:
 
 ```bash
-# Get the diff
-gh pr diff $1 2>/dev/null
-
-# Get existing review comments so we don't repeat feedback already given
-gh api repos/{owner}/{repo}/pulls/{number}/comments --jq '.[] | "[\(.user.login)] \(.path):\(.line // .original_line) — \(.body)"' 2>/dev/null
-
-# Get top-level review comments
-gh api repos/{owner}/{repo}/pulls/{number}/reviews --jq '.[] | "[\(.user.login)] \(.state): \(.body)"' 2>/dev/null
+gh pr view ${1:+$1} --json number,title,additions,deletions,changedFiles,body 2>/dev/null
 ```
 
-### Step 3: Check CI/CD and test status
+| PR Type | Depth | Strategy |
+|---------|-------|----------|
+| Hotfix / site-down | Quick sanity | Skip to Correctness, fast approval |
+| Config / docs changes | Lightweight | Gates + quick Correctness, skip Design |
+| Small feature (< 200 LOC) | Standard | All rounds, single sitting |
+| Medium feature (200-400 LOC) | Full multi-pass | All rounds |
+| Large feature (400+ LOC) | Architecture-focused | Warn user, focus on Design, limit line-by-line |
+| Refactoring (no behavior change) | Test-focused | Gates + Correctness (trust test suite) |
 
-This is the **highest priority** part of the review. Before looking at code quality, verify the PR's automated checks.
+### Round 1: Gates
 
-```bash
-# Fetch all check statuses
-gh pr checks $1 2>/dev/null
-```
+Run the **review-gates** skill:
+- Check CI/CD status, test results, linting
+- Fetch existing reviewer comments (for dedup in later rounds)
+- Determine self-review vs external review mode
 
-Evaluate:
-- **Are all CI checks passing?** If not, flag failing checks as the top issue. No point reviewing code that doesn't build or pass CI.
-- **Are tests passing?** If tests are failing, this is the first thing the author needs to fix.
-- **Are linting/static analysis checks passing?** Don't manually flag style issues that a linter would catch.
+**If CI is failing, stop here. That is the review.**
 
-### Step 4: Evaluate test coverage of the changes
+### Round 2: Design
 
-Look at the diff and determine:
-- **Are there tests for the new/changed behavior?** If new functionality was added or existing behavior changed, there should be corresponding test changes.
-- **Are edge cases covered?** Look for boundary conditions, error paths, and nil/empty inputs.
-- **Are tests testing the right thing?** Tests that only assert "no error" without checking the result are weak. Tests that are tightly coupled to implementation details are brittle.
+Run the **review-design** skill:
+- Assess architectural fit, abstraction level, scope
+- Check for design-level concerns that would require restructuring
 
-If the PR has no test changes and introduces new behavior, this should be flagged as the primary concern.
+**If a fundamental design issue exists, raise it as a Blocker and skip Round 3.** Do not waste effort reviewing line-by-line code that will be rewritten. This prevents Priority Inversion.
 
-### Step 5: Filter out already-given feedback
+### Round 3: Correctness
 
-Review the existing comments fetched in Step 2. **Do not raise issues that another reviewer has already called out.** If someone has already flagged a bug, missing test, or style issue, skip it. Only add new value.
+Run the **review-correctness** skill:
+- Line-by-line review for bugs, security, error handling, tests, performance
+- Label every comment: `Blocker:`, `Warning:`, or `Nit:`
+- Surface ALL issues in one pass (no drip-feeding)
 
-If you agree with existing feedback that hasn't been addressed, you can briefly reinforce it ("agree with @reviewer here") but do not restate the full concern.
+### Round 4: Verdict
 
-### Step 6: Determine review mode
+Run the **review-verdict** skill:
+- Synthesize findings from all rounds
+- Apply ghostwriter style to all output
+- Determine verdict: APPROVE / REQUEST CHANGES / COMMENT
+- Apply termination criteria to prevent loops
 
-- **Self-review**: If the PR author matches `gh api user --jq '.login'`, focus on what you might have missed before submitting
-- **External review**: Full review with draft comments for another person's PR
+## Anti-Patterns This Pipeline Prevents
 
-### Step 7: Query writing style
-
-If the `qdrant-find` MCP tool is available, run 2-3 queries:
-1. Topic query matching the PR content (e.g., "helm chart security", "database migration")
-2. Comment type query (e.g., "nitpick with code suggestion", "architecture concern")
-3. Tone query (e.g., "constructive code review", "positive praise with feedback")
-
-Use retrieved samples to calibrate voice and tone.
-
-### Step 8: Analyze the diff
-
-With CI/tests/existing feedback already handled, now review the code for:
-- **Bugs**: Logic errors, off-by-one, nil/null handling, race conditions
-- **Security**: Input validation, auth checks, injection risks, secrets exposure
-- **Performance**: N+1 queries, unnecessary allocations, missing caching
-- **Error handling**: Swallowed errors, missing context, unhelpful messages
-- **Consistency**: Does the code follow existing patterns in the codebase?
-
-Do **not** flag:
-- Style issues that linting would catch (if linters are in CI)
-- Issues already raised by other reviewers
-- Nitpicks on code that is being deleted
-
-### Step 9: Write review comments
-
-Apply the ghostwriter skill for all written output:
-- Use the three-part structure: **Observation** → **Why It Matters** → **Suggested Fix**
-- Apply severity-to-tone mapping from ghostwriter
-- Write a summary comment with severity calibration
-
-## Output Format
-
-```
-### PR Review: #[number] - [title]
-
-**Author**: @[author]
-**Branch**: [head] → [base]
-**Changes**: +[additions] / -[deletions] across [changedFiles] files
-
----
-
-#### CI/CD Status
-| Check       | Status                    |
-|-------------|---------------------------|
-| [check-name]| PASS / FAIL / PENDING     |
-
-[If any checks are failing, call them out here with what needs to happen]
-
-#### Test Coverage
-[Assessment of whether the changes have adequate test coverage. Flag gaps.]
-
----
-
-**Summary**: [Ghostwriter-style severity calibration]
-
----
-
-#### [file_path]
-
-**Line [N]** ([severity: Bug/Nit/Suggestion/Question/Blocker]):
-[Ghostwriter-style comment with observation, why it matters, suggested fix]
-
----
-
-### Verdict: [APPROVE / REQUEST CHANGES / COMMENT]
-
-**Ready to submit this review?**
-- Yes: Will post via `gh pr review [number] --comment --body "..."`
-- No: Review stays as a draft for you to refine
-```
-
-## Review Priority Order
-
-1. **CI/CD status** — if checks are failing, that's the review
-2. **Test coverage** — are the changes tested?
-3. **Bugs and correctness** — logic errors, security issues
-4. **Design and patterns** — consistency, performance
-5. **Nits** — only if everything above is clean
+| Anti-Pattern | How It's Prevented |
+|---|---|
+| **Priority Inversion** | Design review (Round 2) happens before detailed review (Round 3). Design blockers skip the detail round entirely. |
+| **Death of a Thousand Round Trips** | Round 3 requires surfacing ALL issues in one pass. No drip-feeding. |
+| **No Termination Criteria** | Round 4 has explicit rules: approve when code improves the system, "LGTM nits aside" is valid, escalate after 2 round-trips. |
+| **Style Wars** | Do not flag style issues that linters catch. Ever. |
+| **Rubber-stamping** | Each round has a specific cognitive frame and checklist. |
 
 ## Notes
 - For self-reviews, focus on "things I'd catch if I were reviewing someone else's PR"
@@ -158,3 +83,4 @@ Apply the ghostwriter skill for all written output:
 - Never use dashes as connectors, no corporate language, no emoji
 - Every substantive comment must explain "why", not just "what"
 - Never duplicate feedback already given by another reviewer
+- If a PR is > 400 LOC, recommend splitting before doing a full review

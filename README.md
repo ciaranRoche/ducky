@@ -56,7 +56,11 @@ All skills are namespaced as `ducky:<name>` (e.g., `/ducky:review`).
 | Skill | Description |
 |-------|-------------|
 | `/duck [topic]` | Rubber duck debugging via Socratic questioning |
-| `/review [PR]` | Review a PR with feedback in your writing style |
+| `/review [PR]` | Multi-pass PR review (orchestrates all review rounds) |
+| `/review-gates [PR]` | Review Round 1: CI/CD status and automated checks |
+| `/review-design [PR]` | Review Round 2: Architecture and design assessment |
+| `/review-correctness [PR]` | Review Round 3: Line-by-line bugs, security, tests |
+| `/review-verdict [PR]` | Review Round 4: Synthesize findings into verdict |
 | `/pr-create [base]` | Create a PR with a well-structured description |
 | `/pr-status [PR]` | Check CI, reviews, and merge readiness |
 | `/research [topic]` | Deep research with synthesized findings |
