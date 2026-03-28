@@ -1,142 +1,169 @@
 ---
 name: jira-triage
-description: Validates JIRA tickets have required fields and quality standards for sprint planning.
+description: Audit sprint tickets for triage - required fields, components, and duplicate detection
+allowed-tools: Bash
+argument-hint: [scope: sprint|backlog|all]
+disable-model-invocation: true
 ---
 
-# JIRA Ticket Triage Skill
+# Triage Check
 
-## Configuration
+Audit JIRA tickets for sprint readiness, including required fields, valid components, and potential duplicates.
 
-This skill uses environment variables for project configuration:
-- `DUCKY_JIRA_PROJECT`: JIRA project key (default: `HYPERFLEET`)
-- `JIRA_BASE_URL`: JIRA instance URL (default: `https://issues.redhat.com`)
+## Arguments
+- `$1` (optional): Scope of check
+  - `sprint` (default): Current sprint tickets only
+  - `backlog`: Backlog items
+  - `all`: All recent tickets
 
-## When to Use This Skill
+## Instructions
 
-Activate when the user:
-- Asks to "triage" a ticket
-- Asks if a ticket is "ready for sprint"
-- Wants to validate ticket completeness
-- Asks "does this ticket have everything we need?"
+1. **Get tickets to audit (current sprint by default):**
+   ```bash
+   jira sprint list --current -p ${DUCKY_JIRA_PROJECT:-HYPERFLEET} --raw 2>/dev/null
+   ```
 
-## Triage Checklist
+2. **CRITICAL - Check for potential duplicates:**
+   ```bash
+   # Search backlog for similar titles - run for each ticket being triaged
+   jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND status != Done AND summary ~ 'keyword'" --plain 2>/dev/null
+   ```
 
-### Required Fields (Must Have)
-| Field | Requirement |
-|-------|-------------|
-| Title | Clear, actionable, under 100 characters |
-| Description | Detailed context (recommend > 100 characters) |
-| Acceptance Criteria | At least 2 clear, testable criteria |
-| Story Points | Set (scale: 0, 1, 3, 5, 8, 13) |
-| Component | Set to a valid project component |
-| Activity Type | Set for capacity planning |
+3. **Find tickets without story points:**
+   ```bash
+   jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND 'Story Points' is EMPTY AND sprint in openSprints() AND issuetype in (Story, Task, Bug)" --plain 2>/dev/null
+   ```
 
-### Recommended Fields
-| Field | Requirement |
-|-------|-------------|
-| Labels | At least 1 relevant label |
-| Epic Link | Connected to parent epic (for Stories) |
-| Fix Version | Target release identified |
-| Priority | Explicitly set (not just default) |
+4. **Find tickets with minimal description:**
+   ```bash
+   jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND sprint in openSprints() AND description is EMPTY" --plain 2>/dev/null
+   ```
 
-### Quality Checks
-- **CRITICAL: Not a duplicate** - Search for similar titles/descriptions in backlog before adding
-- No ambiguous language ("maybe", "probably", "TBD", "possibly")
-- Technical approach outlined or referenced
-- Dependencies identified and linked
-- Scope is achievable in one sprint
+5. **Find tickets without components:**
+   ```bash
+   jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND component is EMPTY AND sprint in openSprints()" --plain 2>/dev/null
+   ```
 
-## Components
+   Verify assigned components are valid for the project.
 
-Components are project-specific. Verify valid components for your project:
-```bash
-jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND component is not EMPTY" --plain 2>/dev/null | head -20
-```
-Check that tickets use components defined in the project settings.
+6. **Find tickets without Activity Type:**
+   ```bash
+   jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND 'Activity Type' is EMPTY AND sprint in openSprints()" --plain 2>/dev/null
+   ```
 
-## How to Check a Ticket
+7. **Find stale tickets (no updates in 7+ days):**
+   ```bash
+   jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND sprint in openSprints() AND status != Done AND updated < -7d" --plain 2>/dev/null
+   ```
 
-Use jira-cli to fetch ticket details:
+8. **Find tickets without labels (recommended):**
+   ```bash
+   jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND labels is EMPTY AND sprint in openSprints()" --plain 2>/dev/null
+   ```
 
-```bash
-jira issue view TICKET-KEY --plain 2>/dev/null
-```
+9. **For detailed ticket inspection (check Title, Acceptance Criteria):**
+   ```bash
+   jira issue view TICKET-KEY --plain 2>/dev/null
+   ```
 
-For JSON output with all fields:
-```bash
-jira issue view TICKET-KEY --raw 2>/dev/null
-```
+   When inspecting individual tickets, verify:
+   - **Title**: Clear, actionable, under 100 characters
+   - **Acceptance Criteria**: At least 2 clear, testable criteria in description
+   - **No ambiguous language**: Check for "maybe", "probably", "TBD", "possibly"
 
 ## Output Format
 
-When analyzing a ticket, provide:
+### Triage Report
 
-### Ticket: TICKET-KEY
+#### CRITICAL: Potential Duplicates
+| Ticket | Summary | Similar To | Similarity |
+|--------|---------|------------|------------|
+| TICKET-1 | [Summary] | TICKET-X | High/Medium |
 
-**Summary:** [Ticket title]
+**Action Required:** Review and close duplicates or link as related.
 
-#### Triage Assessment
+---
 
-| Check | Status | Notes |
-|-------|--------|-------|
-| Title | PASS/FAIL | [Issue if any] |
-| Description | PASS/FAIL | [Length: X chars] |
-| Acceptance Criteria | PASS/FAIL | [Count: X criteria] |
-| Story Points | PASS/FAIL | [Value or "Missing"] |
-| Component | PASS/FAIL | [Must be a valid project component] |
-| Activity Type | PASS/FAIL | [Type or "Uncategorized"] |
+#### Missing Story Points
+| Ticket | Summary | Type |
+|--------|---------|------|
+| TICKET-1 | [Summary] | Story |
 
-#### Overall Score: X/6 Required Checks Passed
+**Action Required:** These tickets need estimation before sprint planning.
 
-#### Verdict
-- **READY FOR SPRINT** - All required fields present, good quality
-- **NEEDS MINOR FIXES** - 1-2 issues to address
-- **NOT READY** - Multiple critical issues
+---
 
-#### Recommended Actions
-1. [Specific action to fix issue 1]
-2. [Specific action to fix issue 2]
+#### Missing/Inadequate Description
+| Ticket | Summary | Description Length |
+|--------|---------|-------------------|
+| TICKET-1 | [Summary] | Empty |
+| TICKET-2 | [Summary] | < 50 chars |
 
-## Activity Types (Sankey Capacity Allocation)
+**Action Required:** Add detailed description with context and acceptance criteria.
 
-Activity Type is **required** for sprint/kanban capacity planning. Tickets without an Activity Type appear as "Uncategorized" and cannot be properly allocated.
+---
 
-### Reactive Work (Non-Negotiable First)
-| Activity Type | Description | Examples |
-|---------------|-------------|----------|
-| **Associate Wellness & Development** | Onboarding, team growth, training, associate experience | Training sessions, mentorship |
-| **Incidents & Support** | Escalations, production issues | Customer escalations, outages |
-| **Security & Compliance** | Vulnerabilities and weaknesses, CVEs | Security patches, compliance fixes |
+#### Invalid or Missing Components
+| Ticket | Summary | Current Component |
+|--------|---------|-------------------|
+| TICKET-1 | [Summary] | None |
+| TICKET-2 | [Summary] | InvalidComponent |
 
-### Core Principles (Quality Focus)
-| Activity Type | Description | Examples |
-|---------------|-------------|----------|
-| **Quality / Stability / Reliability** | Bugs, SLOs, chores, tech debt, PMR action items, toil reduction | Bug fixes, performance improvements |
+**Valid Components:** Check project settings for valid components.
 
-### Proactive Work (Balance Remaining Capacity)
-| Activity Type | Description | Examples |
-|---------------|-------------|----------|
-| **Future Sustainability** | Productivity improvements, team improvements, upstream, proactive architecture, enablement | Tooling, automation, refactoring |
-| **Product / Portfolio Work** | Strategic portfolio (HATSTRAT), strategic product, product outcome, BU features | New features, product enhancements |
+**Action Required:** Assign valid component for tracking.
 
-### Priority Order
-1. **Non-Negotiable**: Achieve SLAs for Escalations & CVEs
-2. **Core Principles**: Reduce bug backlog, ensure quality/stability/reliability
-3. **Then Balance**: Set up for long-term success by balancing remaining capacity between Future Sustainability and Product Work
+---
 
-## Red Flags to Highlight
+#### Missing Activity Type
+| Ticket | Summary | Type |
+|--------|---------|------|
+| TICKET-1 | [Summary] | Story |
 
-- Descriptions under 50 characters
-- "TBD" or placeholder text in any field
-- Story points of 13+ (must be broken down)
-- No acceptance criteria at all
-- Vague titles like "Fix bug" or "Update feature"
-- Tickets open > 30 days without progress
-- **Missing Activity Type** (appears as Uncategorized in capacity planning)
-- **Invalid Component** (must be a valid component for the configured project)
+**Valid Activity Types:** Associate Wellness & Development, Incidents & Support, Security & Compliance, Quality / Stability / Reliability, Future Sustainability, Product / Portfolio Work
 
-## Integration with Other Skills
+**Action Required:** Set Activity Type for capacity planning.
 
-This skill complements the `/triage` skill:
-- `/triage`: Bulk audit of sprint tickets
-- `jira-triage`: Deep-dive on individual ticket quality
+---
+
+#### Stale Tickets (No Update 7+ Days)
+| Ticket | Summary | Status | Last Updated |
+|--------|---------|--------|--------------|
+
+**Action Required:** Update status or add comment on progress.
+
+---
+
+### Summary Score (6 Required Fields)
+
+| Check | Pass | Fail | Score |
+|-------|------|------|-------|
+| Title | X | X | X% |
+| Description | X | X | X% |
+| Acceptance Criteria | X | X | X% |
+| Story Points | X | X | X% |
+| Component (valid) | X | X | X% |
+| Activity Type | X | X | X% |
+| **Overall** | | | **X%** |
+
+### Quality Checks
+
+| Check | Pass | Fail |
+|-------|------|------|
+| **Not Duplicate (CRITICAL)** | X | X |
+| No Ambiguous Language | X | X |
+| Freshness (updated < 7d) | X | X |
+
+### Sprint Readiness
+- **Ready for Sprint:** X tickets
+- **Needs Work:** X tickets
+- **Critical Issues:** X tickets
+
+### Top Priority Fixes
+1. [Most critical triage issue - duplicates are highest priority]
+2. [Second priority]
+3. [Third priority]
+
+If jira-cli is not installed or configured, inform the user they need to:
+1. Install jira-cli: `brew install ankitpokhrel/jira-cli/jira-cli`
+2. Configure it: `jira init`
