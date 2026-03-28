@@ -135,8 +135,8 @@ Activity Type is **required** for sprint/kanban capacity planning. Tickets witho
 - **Missing Activity Type** (appears as Uncategorized in capacity planning)
 - **Invalid Component** (must be a valid component for the configured project)
 
-## Integration with Commands
+## Integration with Other Skills
 
-This skill complements the `/triage` command:
-- Command: Bulk audit of sprint tickets
-- Skill: Deep-dive on individual ticket quality
+This skill complements the `/triage` skill:
+- `/triage`: Bulk audit of sprint tickets
+- `jira-triage`: Deep-dive on individual ticket quality

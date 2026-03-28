@@ -1,6 +1,6 @@
 ---
 name: research
-description: Deep research on a technical topic with synthesized findings
+description: Interactive inline research on a technical topic with synthesized findings. For autonomous deep-dive research, use the researcher agent instead.
 allowed-tools: Bash, WebSearch, WebFetch, Glob, Grep, Read, mcp__writing-samples__qdrant-find
 argument-hint: [topic]
 ---

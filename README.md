@@ -39,6 +39,16 @@ If using the writing style RAG:
 2. The `mcp-server-qdrant` server is configured in `.mcp.json`
 3. Store writing samples with the `qdrant-store` tool to build your style corpus
 
+## Usage
+
+After installing, type `/` to see available commands in autocomplete, or run `/skills` to list all ducky skills. Key commands:
+
+- `/duck` — rubber duck debugging session
+- `/review` — PR review in your writing style
+- `/research` — deep technical research
+
+All skills are namespaced as `ducky:<name>` (e.g., `/ducky:review`).
+
 ## Skills
 
 ### Slash Commands
