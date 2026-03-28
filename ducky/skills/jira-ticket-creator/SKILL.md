@@ -13,7 +13,7 @@ This skill uses environment variables for project configuration:
 
 ## Writing Style
 
-When writing ticket descriptions, apply the ghostwriter skill for tone and voice.
+When writing ticket descriptions, apply the ducky-ghostwriter skill for tone and voice.
 Use casual, technically precise language that matches the user's personal style.
 If the `qdrant-find` MCP tool is available, query for style samples matching
 "technical documentation" or "ticket description" to align voice.

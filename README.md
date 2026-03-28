@@ -6,7 +6,7 @@ Personal AI pair programming toolkit for Claude Code. Rubber duck debugging, PR 
 
 A Claude Code plugin that bundles:
 
-- **Skills** (`/review`, `/research`, `/brainstorm`, ghostwriter, pair-programmer, etc.) for interactive workflows and reusable capabilities
+- **Skills** (`/ducky-review`, `/ducky-research`, `/ducky-brainstorm`, etc.) for interactive workflows and reusable capabilities
 - **Agents** (researcher) for autonomous multi-step tasks
 - **MCP integration** with Qdrant for writing style RAG
 
@@ -43,45 +43,56 @@ If using the writing style RAG:
 
 After installing, type `/` to see available commands in autocomplete, or run `/skills` to list all ducky skills. Key commands:
 
-- `/duck` — rubber duck debugging session
-- `/review` — PR review in your writing style
-- `/research` — deep technical research
+- `/ducky-duck` — rubber duck debugging session
+- `/ducky-review` — PR review in your writing style
+- `/ducky-research` — deep technical research
 
-All skills are namespaced as `ducky:<name>` (e.g., `/ducky:review`).
+All skills are namespaced as `ducky:<name>` (e.g., `/ducky:ducky-review`).
 
 ## Skills
 
 ### Slash Commands
 
+#### Ducky
+
 | Skill | Description |
 |-------|-------------|
-| `/duck [topic]` | Rubber duck debugging via Socratic questioning |
-| `/review [PR]` | Multi-pass PR review (orchestrates all review rounds) |
-| `/review-gates [PR]` | Review Round 1: CI/CD status and automated checks |
-| `/review-design [PR]` | Review Round 2: Architecture and design assessment |
-| `/review-correctness [PR]` | Review Round 3: Line-by-line bugs, security, tests |
-| `/review-verdict [PR]` | Review Round 4: Synthesize findings into verdict |
-| `/pr-create [base]` | Create a PR with a well-structured description |
-| `/pr-status [PR]` | Check CI, reviews, and merge readiness |
-| `/research [topic]` | Deep research with synthesized findings |
-| `/brainstorm [topic]` | Structured brainstorming with thinking frameworks |
-| `/issues [action]` | GitHub issue management |
-| `/gh-actions [action]` | GitHub Actions workflow management |
-| `/my-sprint` | Current sprint and your assigned tickets |
-| `/my-tasks` | All your assigned JIRA tasks |
-| `/new-comments` | Tickets with new comments you may have missed |
-| `/sprint-status` | Sprint health overview for team leads |
-| `/triage [scope]` | Audit sprint tickets for completeness |
+| `/ducky-duck [topic]` | Rubber duck debugging via Socratic questioning |
+| `/ducky-brainstorm [topic]` | Structured brainstorming with thinking frameworks |
+| `/ducky-research [topic]` | Deep research with synthesized findings |
+| `/ducky-review [PR]` | Multi-pass PR review (orchestrates all review rounds) |
+| `/ducky-review-gates [PR]` | Review Round 1: CI/CD status and automated checks |
+| `/ducky-review-design [PR]` | Review Round 2: Architecture and design assessment |
+| `/ducky-review-correctness [PR]` | Review Round 3: Line-by-line bugs, security, tests |
+| `/ducky-review-verdict [PR]` | Review Round 4: Synthesize findings into verdict |
+
+#### GitHub
+
+| Skill | Description |
+|-------|-------------|
+| `/gh-issues [action]` | GitHub issue management |
+| `/gh-pr-create [base]` | Create a PR with a well-structured description |
+| `/gh-pr-status [PR]` | Check CI, reviews, and merge readiness |
+
+#### JIRA
+
+| Skill | Description |
+|-------|-------------|
+| `/jira-my-sprint` | Current sprint and your assigned tickets |
+| `/jira-my-tasks` | All your assigned JIRA tasks |
+| `/jira-new-comments` | Tickets with new comments you may have missed |
+| `/jira-sprint-status` | Sprint health overview for team leads |
+| `/jira-triage [scope]` | Audit sprint tickets for completeness |
 
 ### Background Skills
 
 | Skill | Description |
 |-------|-------------|
-| **ghostwriter** | Personal writing style applied to all output |
-| **pair-programmer** | Rubber duck debugging via Socratic questioning |
+| **ducky-ghostwriter** | Personal writing style applied to all output |
+| **ducky-pair-programmer** | Rubber duck debugging via Socratic questioning |
 | **jira-ticket-creator** | Create well-structured JIRA tickets via CLI |
 | **jira-story-pointer** | Estimate story points with complexity analysis |
-| **jira-triage** | Validate ticket quality for sprint readiness |
+| **jira-ticket-triage** | Validate ticket quality for sprint readiness |
 
 ## Agents
 
@@ -91,6 +102,6 @@ All skills are namespaced as `ducky:<name>` (e.g., `/ducky:review`).
 
 ## Customization
 
-The ghostwriter skill (`skills/ghostwriter/SKILL.md`) contains writing style examples and rules. Edit these to match your own voice, tone, and formatting preferences.
+The ghostwriter skill (`skills/ducky-ghostwriter/SKILL.md`) contains writing style examples and rules. Edit these to match your own voice, tone, and formatting preferences.
 
 For RAG-based style matching, store samples in Qdrant using the `qdrant-store` MCP tool. This gives better results than static examples and improves over time as you add more samples.
