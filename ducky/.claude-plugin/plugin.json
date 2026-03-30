@@ -1,6 +1,6 @@
 {
   "name": "ducky",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Personal AI pair programming toolkit — rubber duck debugging, PR reviews, brainstorming, research, JIRA, and GitHub ops in your writing style",
   "author": {
     "name": "Ciaran Roche",
