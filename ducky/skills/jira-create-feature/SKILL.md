@@ -24,11 +24,13 @@ If `qdrant-find` MCP tool is available, query for "ticket description" style sam
 ## JIRA Wiki Markup (NOT Markdown)
 
 - Headers: `h3. Title` (space after period, never `###`)
-- Bullets: `* item`, nested: `** item` (never `-`)
+- Bullets: `* item`, nested: `** item` (never `-` or `•`)
 - Bold: `*bold*`, Italic: `_italic_`
 - Inline code: `{{code}}` (never backticks)
-- NO curly braces `{}` in content (use `:id` or SCREAMING_CASE for placeholders)
-- NO code blocks via CLI (add manually in web UI)
+- NO curly braces `{}` in content -- they break JIRA rendering (learned from HYPERFLEET-258 where `{customer-id}` broke the ticket). Use `:id` or SCREAMING_CASE instead.
+- API endpoints: `*POST* /api/v1/clusters/:id` (colon notation, never `/clusters/{id}`)
+- NO code blocks via CLI (renders as empty gray box -- add manually in web UI)
+- NO YAML comments in code blocks -- `#` is interpreted as `h1.` header
 - Always write descriptions to a temp file, never inline strings
 
 ## Important: Feature-Specific Notes
