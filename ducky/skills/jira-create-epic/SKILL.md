@@ -106,6 +106,11 @@ EOF
 
 **CRITICAL: Use `--template` for epics, NOT `-b "$(cat ...)"`**
 
+Why: Epic descriptions often contain wiki markup characters (`*`, `{`, `h1.`) that get
+mangled by shell expansion when passed through `-b "$(cat ...)"`. The `--template` flag
+reads the file directly, bypassing shell interpolation. Other issue types are shorter
+and simpler, so `-b "$(cat ...)"` works fine for them.
+
 ```bash
 jira issue create --project ${DUCKY_JIRA_PROJECT:-HYPERFLEET} --type Epic \
   --summary "Epic: Full Title Here" \
