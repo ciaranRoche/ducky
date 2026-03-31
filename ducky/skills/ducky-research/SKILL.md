@@ -1,6 +1,6 @@
 ---
 name: ducky-research
-description: Interactive inline research on a technical topic with synthesized findings. For autonomous deep-dive research, use the researcher agent instead.
+description: Quick inline research on a technical topic with synthesized findings. For autonomous deep-dive research, use the researcher agent instead.
 allowed-tools: Bash, WebSearch, WebFetch, Glob, Grep, Read, mcp__writing-samples__qdrant-find
 argument-hint: [topic]
 ---
@@ -91,8 +91,19 @@ Source: [URL or reference]
 - [Related topic worth investigating]
 ```
 
+## When to Use This vs the Researcher Agent
+
+| | `/ducky-research` (this skill) | `researcher` agent |
+|---|---|---|
+| **Speed** | Fast, inline in conversation | Slower, runs autonomously |
+| **Depth** | 3-5 web searches, quick synthesis | Multi-phase deep investigation |
+| **Best for** | Quick lookups, API questions, "how does X work?" | Complex topics needing cross-referencing, trade-off analysis, multi-source synthesis |
+| **Interaction** | You stay in the conversation loop | Agent works independently and returns a full report |
+| **Use when** | You need an answer now to unblock your current task | You need thorough research and can wait for a comprehensive report |
+
+**Rule of thumb:** If you can answer it with a few searches and a summary, use this skill. If the answer requires comparing multiple approaches, reading long docs, or synthesizing across many sources, use the researcher agent.
+
 ## Notes
-- This command runs inline. For autonomous deep-dive research, use the `researcher` agent instead.
 - Always cite sources for factual claims
 - Distinguish between established facts and opinions
 - Highlight areas of uncertainty or conflicting information

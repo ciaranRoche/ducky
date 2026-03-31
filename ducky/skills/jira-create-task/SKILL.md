@@ -142,6 +142,14 @@ For spikes, prefix the summary: `--summary "[SPIKE] Research question summary"`
 
 Valid activity types: `Associate Wellness & Development`, `Incidents & Support`, `Security & Compliance`, `Quality / Stability / Reliability`, `Future Sustainability`, `Product / Portfolio Work`
 
+### Discovering Valid Components
+
+Before assigning a component, check what components exist in the project:
+```bash
+jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND component is not EMPTY" --plain 2>/dev/null | head -20
+```
+If you know the component, add `--component "ComponentName"` to the create command.
+
 ### Step 4: Post-Creation
 
 ```bash
@@ -176,6 +184,12 @@ Use exact syntax: `--custom story-points=X` where X is 0, 1, 3, 5, 8, or 13.
 
 ### --body-file Flag
 Does not exist. Use `-b "$(cat /tmp/file.txt)"` instead.
+
+## Prerequisites
+
+If jira-cli is not installed or configured, inform the user they need to:
+1. Install jira-cli: `brew install ankitpokhrel/jira-cli/jira-cli`
+2. Configure it: `jira init`
 
 ## Integration
 

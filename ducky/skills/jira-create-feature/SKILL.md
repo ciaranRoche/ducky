@@ -143,6 +143,14 @@ Notes:
 - No `--custom activity-type` -- set on child epics/stories instead
 - If `--type Feature` returns an error, the JIRA instance may use `--type Initiative` instead
 
+### Discovering Valid Components
+
+Before assigning a component, check what components exist in the project:
+```bash
+jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND component is not EMPTY" --plain 2>/dev/null | head -20
+```
+If you know the component, add `--component "ComponentName"` to the create command.
+
 ### Step 4: Post-Creation
 
 ```bash
@@ -182,6 +190,12 @@ Ensure space after period: `h3. What` (not `h3.What`)
 
 ### --body-file Flag
 Does not exist. Use `-b "$(cat /tmp/file.txt)"` instead.
+
+## Prerequisites
+
+If jira-cli is not installed or configured, inform the user they need to:
+1. Install jira-cli: `brew install ankitpokhrel/jira-cli/jira-cli`
+2. Configure it: `jira init`
 
 ## Integration
 

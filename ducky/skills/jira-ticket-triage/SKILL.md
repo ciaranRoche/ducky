@@ -135,6 +135,12 @@ Activity Type is **required** for sprint/kanban capacity planning. Tickets witho
 - **Missing Activity Type** (appears as Uncategorized in capacity planning)
 - **Invalid Component** (must be a valid component for the configured project)
 
+## Prerequisites
+
+If jira-cli is not installed or configured, inform the user they need to:
+1. Install jira-cli: `brew install ankitpokhrel/jira-cli/jira-cli`
+2. Configure it: `jira init`
+
 ## Integration with Other Skills
 
 This skill complements the `/jira-triage` skill:
