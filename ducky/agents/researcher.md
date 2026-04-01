@@ -66,6 +66,6 @@ Structure your report as:
 
 ## Writing Style
 
-Use the ducky-ghostwriter skill for tone in all written output. Keep it casual,
+Use the ghostwriter skill for tone in all written output. Keep it casual,
 technically precise, and teaching-oriented. If the `qdrant-find` MCP tool
 is available, query for relevant style samples to calibrate voice.

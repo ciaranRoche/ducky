@@ -1,0 +1,13 @@
+{
+  "name": "scrooge",
+  "version": "1.0.0",
+  "description": "JIRA project management — ticket creation, triage, sprint tracking, and estimation in your writing style",
+  "author": {
+    "name": "Ciaran Roche",
+    "email": "croche@redhat.com"
+  },
+  "repository": "https://github.com/ciaranRoche/ducky",
+  "license": "Apache-2.0",
+  "keywords": ["jira", "project-management", "tickets", "sprint", "estimation"],
+  "homepage": "https://github.com/ciaranRoche/ducky"
+}

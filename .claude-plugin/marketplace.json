@@ -10,9 +10,23 @@
     {
       "name": "ducky",
       "source": "./ducky",
-      "description": "Personal AI pair programming toolkit — rubber duck debugging, PR reviews, brainstorming, research, JIRA, and GitHub ops in your writing style",
+      "description": "Rubber duck thinking companion — debugging, brainstorming, research, and Socratic questioning in your writing style",
       "category": "productivity",
-      "keywords": ["pair-programming", "jira", "github", "code-review", "writing-style"]
+      "keywords": ["pair-programming", "debugging", "brainstorming", "research", "writing-style"]
+    },
+    {
+      "name": "scrooge",
+      "source": "./scrooge",
+      "description": "JIRA project management — ticket creation, triage, sprint tracking, and estimation in your writing style",
+      "category": "productivity",
+      "keywords": ["jira", "project-management", "tickets", "sprint", "estimation"]
+    },
+    {
+      "name": "darkwing",
+      "source": "./darkwing",
+      "description": "GitHub code ops — PR creation, structured code review pipeline, and issue management in your writing style",
+      "category": "productivity",
+      "keywords": ["github", "code-review", "pull-requests", "issues"]
     }
   ]
 }
