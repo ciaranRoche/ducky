@@ -1,24 +1,24 @@
 # ducky
 
-Personal AI pair programming toolkit for Claude Code. Rubber duck debugging, PR reviews, brainstorming, research, JIRA ops, and GitHub ops, all in your writing style.
+Personal AI pair programming toolkit for Claude Code. Three persona-based plugins themed after cartoon ducks, all in your writing style.
 
-## What This Is
+## Plugins
 
-A Claude Code plugin that bundles:
+| Plugin | Persona | What It Does |
+|--------|---------|--------------|
+| **ducky** | The rubber duck | Debugging, brainstorming, research, Socratic questioning |
+| **scrooge** | Scrooge McDuck | JIRA ticket creation, triage, sprint tracking, estimation |
+| **darkwing** | Darkwing Duck | GitHub PRs, structured code review pipeline, issue management |
 
-- **Skills** (`/ducky-review`, `/ducky-research`, `/ducky-brainstorm`, etc.) for interactive workflows and reusable capabilities
-- **Agents** (researcher) for autonomous multi-step tasks
-- **MCP integration** with Qdrant for writing style RAG
-
-The ghostwriter skill is the backbone. It defines a personal writing style that other skills and agents reference, so all generated output sounds like you.
+Install only what you need. Each plugin is self-contained.
 
 ## Prerequisites
 
 - [Claude Code](https://claude.ai/claude-code) CLI
-- [gh](https://cli.github.com/) (GitHub CLI, authenticated)
-- [jira-cli](https://github.com/ankitpokhrel/jira-cli) (configured with `jira init`)
-- [Qdrant](https://qdrant.tech/) running on `localhost:6333` (optional, for writing style RAG)
-- [mcp-server-qdrant](https://github.com/qdrant/mcp-server-qdrant) (optional, MCP bridge to Qdrant)
+- [gh](https://cli.github.com/) (GitHub CLI) — for darkwing
+- [jira-cli](https://github.com/ankitpokhrel/jira-cli) (`jira init`) — for scrooge
+- [Qdrant](https://qdrant.tech/) on `localhost:6333` (optional, for writing style RAG)
+- [mcp-server-qdrant](https://github.com/qdrant/mcp-server-qdrant) (optional, MCP bridge)
 
 ## Setup
 
@@ -26,82 +26,70 @@ The ghostwriter skill is the backbone. It defines a personal writing style that 
    ```bash
    claude plugin marketplace add github:ciaranRoche/ducky
    ```
-2. Install the plugin:
+2. Install the plugins you want:
    ```bash
    claude plugin install ducky@ducky
+   claude plugin install scrooge@ducky
+   claude plugin install darkwing@ducky
    ```
-3. Set environment variables (optional):
-   - `DUCKY_JIRA_PROJECT` - JIRA project key (default: `HYPERFLEET`)
-   - `JIRA_BASE_URL` - JIRA instance URL (default: `https://issues.redhat.com`)
+3. Set environment variables (for scrooge):
+   - `DUCKY_JIRA_PROJECT` — JIRA project key (default: `HYPERFLEET`)
+   - `JIRA_BASE_URL` — JIRA instance URL (default: `https://issues.redhat.com`)
 
-If using the writing style RAG:
+If using writing style RAG:
 1. Start Qdrant: `docker run -p 6333:6333 qdrant/qdrant`
-2. The `mcp-server-qdrant` server is configured in `.mcp.json`
-3. Store writing samples with the `qdrant-store` tool to build your style corpus
-
-## Usage
-
-After installing, type `/` to see available commands in autocomplete, or run `/skills` to list all ducky skills. Key commands:
-
-- `/ducky-duck` — rubber duck debugging session
-- `/ducky-review` — PR review in your writing style
-- `/ducky-research` — deep technical research
-
-All skills are namespaced as `ducky:<name>` (e.g., `/ducky:ducky-review`).
+2. Store writing samples with the `qdrant-store` MCP tool
 
 ## Skills
 
-### Slash Commands
-
-#### Ducky
+### ducky (thinking companion)
 
 | Skill | Description |
 |-------|-------------|
-| `/ducky-duck [topic]` | Rubber duck debugging via Socratic questioning |
-| `/ducky-brainstorm [topic]` | Structured brainstorming with thinking frameworks |
-| `/ducky-research [topic]` | Deep research with synthesized findings |
-| `/ducky-review [PR]` | Multi-pass PR review (orchestrates all review rounds) |
-| `/ducky-review-gates [PR]` | Review Round 1: CI/CD status and automated checks |
-| `/ducky-review-design [PR]` | Review Round 2: Architecture and design assessment |
-| `/ducky-review-correctness [PR]` | Review Round 3: Line-by-line bugs, security, tests |
-| `/ducky-review-verdict [PR]` | Review Round 4: Synthesize findings into verdict |
+| `/ducky:duck [topic]` | Rubber duck debugging via Socratic questioning |
+| `/ducky:brainstorm [topic]` | Structured brainstorming with thinking frameworks |
+| `/ducky:research [topic]` | Technical research with synthesized findings |
 
-#### GitHub
+Background: **ghostwriter** (writing style), **pair-programmer** (Socratic questioning engine)
+Agent: **researcher** (autonomous deep-dive research)
+
+### scrooge (JIRA ops)
 
 | Skill | Description |
 |-------|-------------|
-| `/gh-issues [action]` | GitHub issue management |
-| `/gh-pr-create [base]` | Create a PR with a well-structured description |
-| `/gh-pr-status [PR]` | Check CI, reviews, and merge readiness |
+| `/scrooge:create-story` | User stories with acceptance criteria |
+| `/scrooge:create-bug` | Bug reports with steps to reproduce |
+| `/scrooge:create-task` | Tech debt, spikes, infrastructure work |
+| `/scrooge:create-epic` | Epics with child story breakdown |
+| `/scrooge:create-feature` | Portfolio-level initiatives with benefit hypothesis |
+| `/scrooge:ticket-creator` | Routes to the correct creator by type |
+| `/scrooge:story-pointer` | Estimate story points with complexity analysis |
+| `/scrooge:ticket-triage` | Validate a ticket's sprint readiness |
+| `/scrooge:triage [scope]` | Bulk audit sprint tickets for completeness |
+| `/scrooge:my-sprint` | Current sprint and your assigned tickets |
+| `/scrooge:my-tasks` | All your assigned JIRA tasks |
+| `/scrooge:new-comments` | Tickets with new comments you may have missed |
+| `/scrooge:sprint-status` | Sprint health overview for team leads |
 
-#### JIRA
+Background: **ghostwriter** (writing style), **scrooge** (persona behavioral patterns)
+
+### darkwing (GitHub ops)
 
 | Skill | Description |
 |-------|-------------|
-| `/jira-my-sprint` | Current sprint and your assigned tickets |
-| `/jira-my-tasks` | All your assigned JIRA tasks |
-| `/jira-new-comments` | Tickets with new comments you may have missed |
-| `/jira-sprint-status` | Sprint health overview for team leads |
-| `/jira-triage [scope]` | Audit sprint tickets for completeness |
+| `/darkwing:review [PR]` | Multi-pass PR review (orchestrates 4 rounds) |
+| `/darkwing:review-gates [PR]` | Round 1: CI/CD status and automated checks |
+| `/darkwing:review-design [PR]` | Round 2: Architecture and design assessment |
+| `/darkwing:review-correctness [PR]` | Round 3: Line-by-line bugs, security, tests |
+| `/darkwing:review-verdict [PR]` | Round 4: Synthesize findings into verdict |
+| `/darkwing:pr-create [base]` | Create a PR with structured description |
+| `/darkwing:pr-status [PR]` | Check CI, reviews, and merge readiness |
+| `/darkwing:issues [action]` | GitHub issue management |
 
-### Background Skills
-
-| Skill | Description |
-|-------|-------------|
-| **ducky-ghostwriter** | Personal writing style applied to all output |
-| **ducky-pair-programmer** | Rubber duck debugging via Socratic questioning |
-| **jira-ticket-creator** | Create well-structured JIRA tickets via CLI |
-| **jira-story-pointer** | Estimate story points with complexity analysis |
-| **jira-ticket-triage** | Validate ticket quality for sprint readiness |
-
-## Agents
-
-| Agent | Description |
-|-------|-------------|
-| **researcher** | Autonomous multi-source technical research |
+Background: **ghostwriter** (writing style), **darkwing** (persona behavioral patterns)
 
 ## Customization
 
-The ghostwriter skill (`skills/ducky-ghostwriter/SKILL.md`) contains writing style examples and rules. Edit these to match your own voice, tone, and formatting preferences.
+The ghostwriter skill (in each plugin's `skills/ghostwriter/SKILL.md`) contains writing style examples and rules. Edit these to match your own voice, tone, and formatting preferences.
 
-For RAG-based style matching, store samples in Qdrant using the `qdrant-store` MCP tool. This gives better results than static examples and improves over time as you add more samples.
+For RAG-based style matching, store samples in Qdrant using the `qdrant-store` MCP tool.

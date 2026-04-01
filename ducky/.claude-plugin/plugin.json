@@ -1,13 +1,13 @@
 {
   "name": "ducky",
-  "version": "0.7.0",
-  "description": "Personal AI pair programming toolkit — rubber duck debugging, PR reviews, brainstorming, research, JIRA, and GitHub ops in your writing style",
+  "version": "1.0.0",
+  "description": "Rubber duck thinking companion — debugging, brainstorming, research, and Socratic questioning in your writing style",
   "author": {
     "name": "Ciaran Roche",
     "email": "croche@redhat.com"
   },
   "repository": "https://github.com/ciaranRoche/ducky",
   "license": "Apache-2.0",
-  "keywords": ["pair-programming", "jira", "github", "code-review", "writing-style", "rubber-duck"],
+  "keywords": ["pair-programming", "debugging", "brainstorming", "research", "writing-style", "rubber-duck"],
   "homepage": "https://github.com/ciaranRoche/ducky"
 }
