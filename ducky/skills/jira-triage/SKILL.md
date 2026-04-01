@@ -44,7 +44,10 @@ Audit JIRA tickets for sprint readiness, including required fields, valid compon
    jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND component is EMPTY AND sprint in openSprints()" --plain 2>/dev/null
    ```
 
-   Verify assigned components are valid for the project.
+   Verify assigned components are valid by cross-referencing against known components:
+   ```bash
+   jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND component is not EMPTY" --plain 2>/dev/null | head -20
+   ```
 
 6. **Find tickets without Activity Type:**
    ```bash

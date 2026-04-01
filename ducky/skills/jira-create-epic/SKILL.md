@@ -106,6 +106,11 @@ EOF
 
 **CRITICAL: Use `--template` for epics, NOT `-b "$(cat ...)"`**
 
+Why: Epic descriptions often contain wiki markup characters (`*`, `{`, `h1.`) that get
+mangled by shell expansion when passed through `-b "$(cat ...)"`. The `--template` flag
+reads the file directly, bypassing shell interpolation. Other issue types are shorter
+and simpler, so `-b "$(cat ...)"` works fine for them.
+
 ```bash
 jira issue create --project ${DUCKY_JIRA_PROJECT:-HYPERFLEET} --type Epic \
   --summary "Epic: Full Title Here" \
@@ -119,6 +124,14 @@ Notes:
 - `--template` reads the file directly (unlike `-b "$(cat ...)"` used by other types)
 - No `--custom story-points` -- epics aggregate child points
 - No `--custom activity-type` -- set on child stories instead
+
+### Discovering Valid Components
+
+Before assigning a component, check what components exist in the project:
+```bash
+jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND component is not EMPTY" --plain 2>/dev/null | head -20
+```
+If you know the component, add `--component "ComponentName"` to the create command.
 
 ### Step 4: Post-Creation
 
@@ -160,6 +173,12 @@ Ensure space after period: `h3. What` (not `h3.What`)
 
 ### --body-file Flag
 Does not exist. For epics use `--template /tmp/file.txt`. For other types use `-b "$(cat /tmp/file.txt)"`.
+
+## Prerequisites
+
+If jira-cli is not installed or configured, inform the user they need to:
+1. Install jira-cli: `brew install ankitpokhrel/jira-cli/jira-cli`
+2. Configure it: `jira init`
 
 ## Integration
 

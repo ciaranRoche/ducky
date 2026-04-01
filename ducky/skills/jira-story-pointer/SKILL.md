@@ -156,3 +156,9 @@ When estimating, consider:
 - **Hero Estimates**: Assume average team member, not expert
 - **Planning Fallacy**: Add buffer for unknowns
 - **Story Point Inflation**: Keep consistent with team baseline
+
+## Prerequisites
+
+If jira-cli is not installed or configured, inform the user they need to:
+1. Install jira-cli: `brew install ankitpokhrel/jira-cli/jira-cli`
+2. Configure it: `jira init`
