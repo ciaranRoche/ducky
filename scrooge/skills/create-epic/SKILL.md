@@ -8,7 +8,7 @@ description: Creates a JIRA Epic with scope, success criteria, and child story b
 ## Configuration
 
 - `DUCKY_JIRA_PROJECT`: JIRA project key (default: `HYPERFLEET`)
-- `JIRA_BASE_URL`: JIRA instance URL (default: `https://issues.redhat.com`)
+- `JIRA_BASE_URL`: JIRA instance URL (default: `https://redhat.atlassian.net`)
 
 ## Writing Style
 
@@ -152,7 +152,7 @@ Ticket Created: HYPERFLEET-XXX
 Type: Epic
 Summary: [Title]
 Epic Name: [Short Name]
-Link: https://issues.redhat.com/browse/HYPERFLEET-XXX
+Link: https://redhat.atlassian.net/browse/HYPERFLEET-XXX
 
 Manual steps needed:
 - Link to parent feature [if applicable]
@@ -183,4 +183,4 @@ If jira-cli is not installed or configured, inform the user they need to:
 ## Integration
 
 - **create-story**: Create child stories after epic is set up
-- **triage**: Validate epic quality
+- **ticket-hygiene**: Validate epic quality

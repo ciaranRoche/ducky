@@ -1,12 +1,12 @@
 ---
-name: triage
-description: Audit sprint tickets for triage - required fields, components, and duplicate detection
+name: sprint-hygiene
+description: Audit sprint tickets for hygiene - required fields, components, and duplicate detection
 allowed-tools: Bash
 argument-hint: [scope: sprint|backlog|all]
 disable-model-invocation: true
 ---
 
-# Triage Check
+# Sprint Hygiene Check
 
 Audit JIRA tickets for sprint readiness, including required fields, valid components, and potential duplicates.
 
@@ -25,7 +25,7 @@ Audit JIRA tickets for sprint readiness, including required fields, valid compon
 
 2. **CRITICAL - Check for potential duplicates:**
    ```bash
-   # Search backlog for similar titles - run for each ticket being triaged
+   # Search backlog for similar titles - run for each ticket being checked
    jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND status != Done AND summary ~ 'keyword'" --plain 2>/dev/null
    ```
 
@@ -76,7 +76,7 @@ Audit JIRA tickets for sprint readiness, including required fields, valid compon
 
 ## Output Format
 
-### Triage Report
+### Sprint Hygiene Report
 
 #### CRITICAL: Potential Duplicates
 | Ticket | Summary | Similar To | Similarity |
@@ -163,7 +163,7 @@ Audit JIRA tickets for sprint readiness, including required fields, valid compon
 - **Critical Issues:** X tickets
 
 ### Top Priority Fixes
-1. [Most critical triage issue - duplicates are highest priority]
+1. [Most critical hygiene issue - duplicates are highest priority]
 2. [Second priority]
 3. [Third priority]
 

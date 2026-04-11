@@ -9,7 +9,7 @@ description: Estimates story points for JIRA tickets by analyzing complexity, sc
 
 This skill uses environment variables for project configuration:
 - `DUCKY_JIRA_PROJECT`: JIRA project key (default: `HYPERFLEET`)
-- `JIRA_BASE_URL`: JIRA instance URL (default: `https://issues.redhat.com`)
+- `JIRA_BASE_URL`: JIRA instance URL (default: `https://redhat.atlassian.net`)
 
 ## When to Use This Skill
 

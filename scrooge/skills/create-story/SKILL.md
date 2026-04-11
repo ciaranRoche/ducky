@@ -8,7 +8,7 @@ description: Creates a JIRA Story with user story format, acceptance criteria, a
 ## Configuration
 
 - `DUCKY_JIRA_PROJECT`: JIRA project key (default: `HYPERFLEET`)
-- `JIRA_BASE_URL`: JIRA instance URL (default: `https://issues.redhat.com`)
+- `JIRA_BASE_URL`: JIRA instance URL (default: `https://redhat.atlassian.net`)
 
 ## Writing Style
 
@@ -151,7 +151,7 @@ Summary: [Title]
 Points: [X]
 Priority: [Priority]
 Activity Type: [Type]
-Link: https://issues.redhat.com/browse/HYPERFLEET-XXX
+Link: https://redhat.atlassian.net/browse/HYPERFLEET-XXX
 
 Manual steps needed:
 - Link to parent epic [if applicable]
@@ -175,4 +175,5 @@ If jira-cli is not installed or configured, inform the user they need to:
 ## Integration
 
 - **story-pointer**: Detailed estimation methodology
-- **triage**: Validate ticket quality after creation
+- **ticket-hygiene**: Validate ticket quality after creation
+- **ticket-triage**: Interactive triage session for deeper assessment

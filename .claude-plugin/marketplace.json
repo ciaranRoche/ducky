@@ -17,7 +17,7 @@
     {
       "name": "scrooge",
       "source": "./scrooge",
-      "description": "JIRA project management — ticket creation, triage, sprint tracking, and estimation in your writing style",
+      "description": "JIRA project management — ticket creation, triage, hygiene checks, sprint tracking, and estimation in your writing style",
       "category": "productivity",
       "keywords": ["jira", "project-management", "tickets", "sprint", "estimation"]
     },

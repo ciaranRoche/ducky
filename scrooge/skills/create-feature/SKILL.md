@@ -8,7 +8,7 @@ description: Creates a JIRA Feature with problem statement, benefit hypothesis, 
 ## Configuration
 
 - `DUCKY_JIRA_PROJECT`: JIRA project key (default: `HYPERFLEET`)
-- `JIRA_BASE_URL`: JIRA instance URL (default: `https://issues.redhat.com`)
+- `JIRA_BASE_URL`: JIRA instance URL (default: `https://redhat.atlassian.net`)
 
 ## Writing Style
 
@@ -170,7 +170,7 @@ Ticket Created: HYPERFLEET-XXX
 Type: Feature
 Summary: [Title]
 Priority: [Priority]
-Link: https://issues.redhat.com/browse/HYPERFLEET-XXX
+Link: https://redhat.atlassian.net/browse/HYPERFLEET-XXX
 
 Manual steps needed:
 - Link child epics to this feature
@@ -200,4 +200,4 @@ If jira-cli is not installed or configured, inform the user they need to:
 ## Integration
 
 - **create-epic**: Create child epics after feature is set up
-- **triage**: Validate feature quality
+- **ticket-hygiene**: Validate feature quality
