@@ -101,6 +101,7 @@ Background: **ghostwriter** (writing style), **darkwing** (persona behavioral pa
 | Skill | Description |
 |-------|-------------|
 | `/webby:daily` | Read today's daily note — surface todos and context |
+| `/webby:todo <add\|done\|pick>` | Manage todos — add items, mark done, or pick one to focus on |
 | `/webby:session-log [summary]` | Append session summary to today's daily note |
 | `/webby:vault-query <topic>` | Search vault for relevant context |
 | `/webby:vault-save <topic>` | File new knowledge into the vault |

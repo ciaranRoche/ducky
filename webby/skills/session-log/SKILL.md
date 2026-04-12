@@ -121,6 +121,5 @@ Use Bash to compute the full date string: `date +"%A, %B %-d, %Y"`.
 
 ## Notes
 
-- Never modify `#### Work To Dos` — the Rollover Daily Todos plugin manages that section
 - Apply the ghostwriter skill for tone in the log entries
 - Keep entries concise. The daily note is a reference, not a transcript
