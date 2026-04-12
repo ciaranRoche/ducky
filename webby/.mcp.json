@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "obsidian": {
+      "command": "npx",
+      "args": ["@bitbonsai/mcpvault@latest", "/home/croche/Vault/Notes"],
+      "env": {}
+    },
+    "writing-samples": {
+      "command": "mcp-server-qdrant",
+      "args": [],
+      "env": {
+        "QDRANT_URL": "http://127.0.0.1:6333",
+        "COLLECTION_NAME": "writing-samples",
+        "TOOL_STORE_DESCRIPTION": "Store a writing sample for future style reference.",
+        "TOOL_FIND_DESCRIPTION": "Search past writing samples to find relevant examples of the user's writing voice, tone, and style patterns."
+      }
+    }
+  }
+}

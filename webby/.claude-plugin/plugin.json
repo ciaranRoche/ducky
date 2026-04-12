@@ -1,0 +1,13 @@
+{
+  "name": "webby",
+  "version": "1.0.0",
+  "description": "Obsidian second brain — daily notes, session logging, vault search, and knowledge capture in your writing style",
+  "author": {
+    "name": "Ciaran Roche",
+    "email": "croche@redhat.com"
+  },
+  "repository": "https://github.com/ciaranRoche/ducky",
+  "license": "Apache-2.0",
+  "keywords": ["obsidian", "vault", "second-brain", "knowledge-management", "daily-notes"],
+  "homepage": "https://github.com/ciaranRoche/ducky"
+}

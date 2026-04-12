@@ -27,6 +27,13 @@
       "description": "GitHub code ops — PR creation, structured code review pipeline, and issue management in your writing style",
       "category": "productivity",
       "keywords": ["github", "code-review", "pull-requests", "issues"]
+    },
+    {
+      "name": "webby",
+      "source": "./webby",
+      "description": "Obsidian second brain — daily notes, session logging, vault search, and knowledge capture in your writing style",
+      "category": "productivity",
+      "keywords": ["obsidian", "vault", "second-brain", "knowledge-management", "daily-notes"]
     }
   ]
 }

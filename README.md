@@ -1,6 +1,6 @@
 # ducky
 
-Personal AI pair programming toolkit for Claude Code. Three persona-based plugins themed after cartoon ducks, all in your writing style.
+Personal AI pair programming toolkit for Claude Code. Four persona-based plugins themed after cartoon ducks, all in your writing style.
 
 ## Plugins
 
@@ -9,6 +9,7 @@ Personal AI pair programming toolkit for Claude Code. Three persona-based plugin
 | **ducky** | The rubber duck | Debugging, brainstorming, research, Socratic questioning |
 | **scrooge** | Scrooge McDuck | JIRA ticket creation, triage, sprint tracking, estimation |
 | **darkwing** | Darkwing Duck | GitHub PRs, structured code review pipeline, issue management |
+| **webby** | Webby Vanderquack | Obsidian second brain, daily notes, session logging, vault search |
 
 Install only what you need. Each plugin is self-contained.
 
@@ -19,6 +20,7 @@ Install only what you need. Each plugin is self-contained.
 - [jira-cli](https://github.com/ankitpokhrel/jira-cli) (`jira init`) — for scrooge
 - [Qdrant](https://qdrant.tech/) on `localhost:6333` (optional, for writing style RAG)
 - [mcp-server-qdrant](https://github.com/qdrant/mcp-server-qdrant) (optional, MCP bridge)
+- [MCPVault](https://github.com/bitbonsai/mcpvault) (`npm install -g @bitbonsai/mcpvault`) — for webby
 
 ## Setup
 
@@ -31,8 +33,14 @@ Install only what you need. Each plugin is self-contained.
    claude plugin install ducky@ducky
    claude plugin install scrooge@ducky
    claude plugin install darkwing@ducky
+   claude plugin install webby@ducky
    ```
-3. Set environment variables (for scrooge):
+3. Set up vault access (for webby):
+   ```bash
+   # Run /webby:vault-setup inside Claude Code, or manually:
+   claude mcp add obsidian --scope user -- npx @bitbonsai/mcpvault@latest /path/to/your/vault
+   ```
+4. Set environment variables (for scrooge):
    - `DUCKY_JIRA_PROJECT` — JIRA project key (default: `HYPERFLEET`)
    - `JIRA_BASE_URL` — JIRA instance URL (default: `https://issues.redhat.com`)
 
@@ -87,6 +95,18 @@ Background: **ghostwriter** (writing style), **scrooge** (persona behavioral pat
 | `/darkwing:issues [action]` | GitHub issue management |
 
 Background: **ghostwriter** (writing style), **darkwing** (persona behavioral patterns)
+
+### webby (second brain)
+
+| Skill | Description |
+|-------|-------------|
+| `/webby:daily` | Read today's daily note — surface todos and context |
+| `/webby:session-log [summary]` | Append session summary to today's daily note |
+| `/webby:vault-query <topic>` | Search vault for relevant context |
+| `/webby:vault-save <topic>` | File new knowledge into the vault |
+| `/webby:vault-setup [path]` | Configure MCPVault for cross-project vault access |
+
+Background: **ghostwriter** (writing style), **webby** (persona behavioral patterns)
 
 ## Customization
 
