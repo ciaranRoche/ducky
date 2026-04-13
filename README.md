@@ -17,7 +17,8 @@ Install only what you need. Each plugin is self-contained.
 
 - [Claude Code](https://claude.ai/claude-code) CLI
 - [gh](https://cli.github.com/) (GitHub CLI) — for darkwing
-- [jira-cli](https://github.com/ankitpokhrel/jira-cli) (`jira init`) — for scrooge
+- [jira-cli](https://github.com/ankitpokhrel/jira-cli) (`jira init`) — for scrooge skills
+- [mcp-atlassian](https://github.com/sooperset/mcp-atlassian) (`uvx mcp-atlassian`) — for scrooge agents
 - [Qdrant](https://qdrant.tech/) on `localhost:6333` (optional, for writing style RAG)
 - [mcp-server-qdrant](https://github.com/qdrant/mcp-server-qdrant) (optional, MCP bridge)
 - [MCPVault](https://github.com/bitbonsai/mcpvault) (`npm install -g @bitbonsai/mcpvault`) — for webby
@@ -43,6 +44,8 @@ Install only what you need. Each plugin is self-contained.
 4. Set environment variables (for scrooge):
    - `DUCKY_JIRA_PROJECT` — JIRA project key (default: `HYPERFLEET`)
    - `JIRA_BASE_URL` — JIRA instance URL (default: `https://issues.redhat.com`)
+   - `JIRA_USERNAME` — Atlassian email (for mcp-atlassian agents)
+   - `JIRA_API_TOKEN` — Atlassian API token (for mcp-atlassian agents)
 
 If using writing style RAG:
 1. Start Qdrant: `docker run -p 6333:6333 qdrant/qdrant`
@@ -78,6 +81,10 @@ Agent: **researcher** (autonomous deep-dive research)
 | `/scrooge:my-tasks` | All your assigned JIRA tasks |
 | `/scrooge:new-comments` | Tickets with new comments you may have missed |
 | `/scrooge:sprint-status` | Sprint health overview for team leads |
+
+| `/scrooge:sprint-report` | Sprint health — progress, velocity, blockers |
+| `/scrooge:new-tickets` | New ticket grooming quality assessment |
+| `/scrooge:backlog-hygiene` | Backlog audit — staleness, field checks, duplicates |
 
 Background: **ghostwriter** (writing style), **scrooge** (persona behavioral patterns)
 
