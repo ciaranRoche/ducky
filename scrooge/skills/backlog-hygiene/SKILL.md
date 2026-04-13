@@ -20,7 +20,7 @@ Audit the full backlog for field completeness, staleness, and potential duplicat
 
 Search using `mcp__atlassian__search` with JQL:
 ```
-project = HYPERFLEET AND status != Done AND status != Closed AND sprint not in openSprints() ORDER BY updated ASC
+project = HYPERFLEET AND status != Done AND status != Closed AND (sprint not in openSprints() OR sprint is EMPTY) ORDER BY updated ASC
 ```
 
 Paginate if needed (use `startAt` parameter).
