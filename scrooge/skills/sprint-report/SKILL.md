@@ -17,6 +17,17 @@ allowed-tools:
 
 Generate a sprint health report for the current active sprint. Read-only — surfaces issues, never modifies tickets. Uses `mcp__atlassian__*` MCP tools exclusively (not jira-cli).
 
+## Story Points Field Mapping
+
+The JIRA instance stores story points in custom fields. When reading issue data from MCP tools, look for these fields (use the first one that has a value):
+
+| Field ID | Name | Notes |
+|----------|------|-------|
+| `customfield_10016` | Story point estimate | Next-gen / Jira Software field — check this first |
+| `customfield_10028` | Story Points | Classic field |
+
+If neither field has a value, treat the issue as having 0 story points and note it in the report.
+
 ## Behavior
 
 ### 1. Find the Active Sprint
