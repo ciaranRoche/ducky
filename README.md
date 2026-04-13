@@ -44,8 +44,8 @@ Install only what you need. Each plugin is self-contained.
 4. Set environment variables (for scrooge):
    - `DUCKY_JIRA_PROJECT` — JIRA project key (default: `HYPERFLEET`)
    - `JIRA_BASE_URL` — JIRA instance URL (default: `https://issues.redhat.com`)
-   - `JIRA_USERNAME` — Atlassian email (for mcp-atlassian agents)
-   - `JIRA_API_TOKEN` — Atlassian API token (for mcp-atlassian agents)
+   - `JIRA_USERNAME` — Atlassian email (for mcp-atlassian skills)
+   - `JIRA_API_TOKEN` — Atlassian API token (for mcp-atlassian skills)
 
 If using writing style RAG:
 1. Start Qdrant: `docker run -p 6333:6333 qdrant/qdrant`
