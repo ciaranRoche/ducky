@@ -7,14 +7,13 @@ Obsidian second brain. Daily notes, session logging, vault search, and knowledge
 ```
 skills/          Slash commands and reusable capabilities (SKILL.md files)
 .claude-plugin/  Plugin manifest
-.mcp.json        MCP server configuration (MCPVault for Obsidian)
 ```
 
 ## Key Conventions
 
 - **Ghostwriter is central.** All vault entries and written output should use the ghostwriter skill for tone and structure.
 - **The webby skill** (`user-invocable: false`) defines the persona's behavioral patterns. It activates as background context for all vault operations.
-- **MCP:** The `obsidian` MCP server connects to the local vault via MCPVault. For cross-project access, run `/vault-setup` to configure at user scope. The `writing-samples` server (provided by the `ducky` plugin) connects to Qdrant for writing style RAG (optional).
+- **MCP:** The `obsidian` MCP server is configured at user scope (run `/vault-setup` if missing). The `writing-samples` server (provided by the `ducky` plugin) connects to Qdrant for writing style RAG (optional).
 - **Daily notes** live at `Daily/YYYY-MM-DD.md` and follow a consistent template with sections for todos, log, review, and related notes.
 - **Vault structure:** Work vs Personal separation. Knowledge, Projects, Meetings directories. Hub notes serve as indexes.
 - **Wiki-links:** Always use Obsidian `[[Note Name]]` syntax when referencing other vault notes.
