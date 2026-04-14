@@ -18,7 +18,7 @@ skills/          Slash commands and reusable capabilities (SKILL.md files)
 - **No curly braces in content.** `{}` breaks JIRA rendering (learned from HYPERFLEET-258). Use `:id` or SCREAMING_CASE for path parameters.
 - **All skills use mcp-atlassian MCP tools** (`mcp__atlassian__jira_*`). No jira-cli dependency.
 - **Environment variables:** `JIRA_USERNAME` and `JIRA_API_TOKEN` are required for mcp-atlassian authentication (Atlassian Cloud API token auth).
-- **MCP:** Two MCP servers: `atlassian` (mcp-atlassian, JIRA access for all skills) and `writing-samples` (Qdrant for writing style RAG, optional).
+- **MCP:** The `atlassian` MCP server (mcp-atlassian) provides JIRA access for all skills. The `writing-samples` server (provided by the `ducky` plugin) connects to Qdrant for writing style RAG (optional).
 
 ## Custom Field Reference
 
