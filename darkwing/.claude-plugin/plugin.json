@@ -1,6 +1,6 @@
 {
   "name": "darkwing",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "GitHub code ops — PR creation, structured code review pipeline, and issue management in your writing style",
   "author": {
     "name": "Ciaran Roche",
