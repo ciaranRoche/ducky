@@ -1,6 +1,8 @@
 ---
 name: ticket-creator
-description: Routes to the correct JIRA ticket creator based on type. Activates when users ask to "create a ticket" or "file a ticket" without specifying a type (bug, story, task, epic, or feature).
+description: Routes to the correct JIRA ticket creator based on type. Activates when
+  users ask to "create a ticket" or "file a ticket" without specifying a type (bug,
+  story, task, epic, or feature).
 ---
 
 # JIRA Ticket Creator (Router)
@@ -34,12 +36,6 @@ Do NOT activate if the user specifies a type -- let the type-specific skill hand
 > - **Feature** -- portfolio-level initiative containing multiple epics
 
 Then invoke the corresponding skill.
-
-## Prerequisites
-
-If jira-cli is not installed or configured, inform the user they need to:
-1. Install jira-cli: `brew install ankitpokhrel/jira-cli/jira-cli`
-2. Configure it: `jira init`
 
 ## Available Creator Skills
 

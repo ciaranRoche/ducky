@@ -1,14 +1,27 @@
 ---
 name: create-bug
-description: Creates a JIRA Bug with steps to reproduce, expected/actual behavior, and fix criteria. Activates when users ask to create a bug report, file a bug, or report an issue.
+description: Creates a JIRA Bug with steps to reproduce, expected/actual behavior,
+  and fix criteria. Activates when users ask to create a bug report, file a bug, or
+  report an issue.
+allowed-tools:
+  - mcp__atlassian__jira_create_issue
+  - mcp__atlassian__jira_get_issue
+  - mcp__atlassian__jira_get_project_components
+  - mcp__atlassian__jira_link_to_epic
+  - mcp__atlassian__jira_search
+  - mcp__atlassian__jira_search_fields
 ---
 
 # JIRA Bug Creator
 
-## Configuration
+Uses `mcp__atlassian__*` MCP tools exclusively (not jira-cli).
 
-- `DUCKY_JIRA_PROJECT`: JIRA project key (default: `HYPERFLEET`)
-- `JIRA_BASE_URL`: JIRA instance URL (default: `https://redhat.atlassian.net`)
+## Custom Field Reference
+
+| Field ID | Name | Format |
+|----------|------|--------|
+| `customfield_10016` | Story point estimate | Number (0, 1, 3, 5, 8, 13) |
+| `customfield_10464` | Activity Type | `{"value": "Type Name"}` |
 
 ## Writing Style
 
@@ -21,17 +34,12 @@ If `qdrant-find` MCP tool is available, query for "ticket description" style sam
 - "there's a bug in...", "I found a bug"
 - "this is broken", "create a bug report"
 
-## JIRA Wiki Markup (NOT Markdown)
+## Description Format
 
-- Headers: `h3. Title` (space after period, never `###`)
-- Bullets: `* item`, nested: `** item` (never `-` or `•`)
-- Bold: `*bold*`, Italic: `_italic_`
-- Inline code: `{{code}}` (never backticks)
+Write descriptions in **Markdown**. The MCP server converts to JIRA's native format automatically.
+
 - NO curly braces `{}` in content -- they break JIRA rendering (learned from HYPERFLEET-258 where `{customer-id}` broke the ticket). Use `:id` or SCREAMING_CASE instead.
-- API endpoints: `*POST* /api/v1/clusters/:id` (colon notation, never `/clusters/{id}`)
-- NO code blocks via CLI (renders as empty gray box -- add manually in web UI)
-- NO YAML comments in code blocks -- `#` is interpreted as `h1.` header
-- Always write descriptions to a temp file, never inline strings
+- API endpoints: `POST /api/v1/clusters/:id` (colon notation, never `/clusters/{id}`)
 
 ## Priority Guidance
 
@@ -63,58 +71,65 @@ Ask the user if needed:
 - What should happen vs what actually happens?
 - How severe is it? (Priority)
 
-### Step 2: Create Description File
+### Step 2: Discover Valid Components
 
-```bash
-cat > /tmp/bug-description.txt << 'EOF'
-h3. What
+Use `mcp__atlassian__jira_get_project_components` with `project_key: HYPERFLEET` to check available components.
+
+### Step 3: Create the Bug
+
+Use `mcp__atlassian__jira_create_issue` with:
+- `project_key`: `HYPERFLEET`
+- `summary`: `Bug: Brief description (< 100 chars)`
+- `issue_type`: `Bug`
+- `description`: The bug description in Markdown (see template below)
+- `components`: component name (if applicable)
+- `additional_fields`: JSON string with custom fields:
+  ```json
+  {
+    "priority": {"name": "Major"},
+    "customfield_10016": 5,
+    "customfield_10464": {"value": "Quality / Stability / Reliability"}
+  }
+  ```
+
+### Description Template
+
+```markdown
+### What
 
 [Description of the bug and its impact. 2-3 sentences.]
 
-h3. Steps to Reproduce
+### Steps to Reproduce
 
-* Step 1
-* Step 2
-* Step 3
+1. Step 1
+2. Step 2
+3. Step 3
 
-h3. Expected Behavior
+### Expected Behavior
 
 [What should happen when following the steps above.]
 
-h3. Actual Behavior
+### Actual Behavior
 
 [What actually happens. Include error messages if available.]
 
-h3. Why
+### Why
 
-* [Who is affected -- users, teams, system reliability]
-* [Severity of impact -- data loss, degraded performance, blocking work]
+- [Who is affected -- users, teams, system reliability]
+- [Severity of impact -- data loss, degraded performance, blocking work]
 
-h3. Acceptance Criteria
+### Acceptance Criteria
 
-* Root cause identified and fixed
-* Regression test added covering this scenario
-* No related side effects introduced
-* [Additional criterion specific to this bug]
+- Root cause identified and fixed
+- Regression test added covering this scenario
+- No related side effects introduced
+- [Additional criterion specific to this bug]
 
-h3. Technical Notes
+### Technical Notes
 
-* Affected component: {{component-name}}
-* Error location: {{file/path}}
-* Relevant logs/errors: [describe, add screenshots via web UI]
-EOF
-```
-
-### Step 3: Create via CLI
-
-```bash
-jira issue create --project ${DUCKY_JIRA_PROJECT:-HYPERFLEET} --type Bug \
-  --summary "Bug: Brief description (< 100 chars)" \
-  --custom story-points=5 \
-  --custom activity-type="Quality / Stability / Reliability" \
-  --priority Major \
-  --no-input \
-  -b "$(cat /tmp/bug-description.txt)"
+- Affected component: `component-name`
+- Error location: `file/path`
+- Relevant logs/errors: [describe, add screenshots via web UI]
 ```
 
 **Activity type** defaults to "Quality / Stability / Reliability". Override for:
@@ -123,24 +138,13 @@ jira issue create --project ${DUCKY_JIRA_PROJECT:-HYPERFLEET} --type Bug \
 
 Valid activity types: `Associate Wellness & Development`, `Incidents & Support`, `Security & Compliance`, `Quality / Stability / Reliability`, `Future Sustainability`, `Product / Portfolio Work`
 
-### Discovering Valid Components
-
-Before assigning a component, check what components exist in the project:
-```bash
-jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND component is not EMPTY" --plain 2>/dev/null | head -20
-```
-If you know the component, add `--component "ComponentName"` to the create command.
-
 ### Step 4: Post-Creation
 
-```bash
-jira issue view ${DUCKY_JIRA_PROJECT:-HYPERFLEET}-XXX --plain
-```
+Use `mcp__atlassian__jira_get_issue` to verify the ticket was created with all fields.
 
-Manual steps (via web UI):
-1. **Link to Epic**: Edit ticket > Link > "is child of" > Epic
-2. **Add Labels**: e.g., `bug`, component labels
-3. **Add Screenshots/Logs**: Attach files via web UI
+If the bug belongs to an epic, use `mcp__atlassian__jira_link_to_epic` to link it:
+- `issue_key`: the new ticket key
+- `epic_key`: the parent epic key
 
 ## Output Format
 
@@ -155,27 +159,16 @@ Activity Type: Quality / Stability / Reliability
 Link: https://redhat.atlassian.net/browse/HYPERFLEET-XXX
 
 Manual steps needed:
-- Link to parent epic [if applicable]
-- Attach screenshots/logs [if available]
+- Add screenshots/logs [if available]
 - Add labels [if applicable]
 ```
-
-## Troubleshooting
-
-### Story Points Not Setting
-Use exact syntax: `--custom story-points=X` where X is 0, 1, 3, 5, 8, or 13.
-
-### --body-file Flag
-Does not exist. Use `-b "$(cat /tmp/file.txt)"` instead.
-
-## Prerequisites
-
-If jira-cli is not installed or configured, inform the user they need to:
-1. Install jira-cli: `brew install ankitpokhrel/jira-cli/jira-cli`
-2. Configure it: `jira init`
 
 ## Integration
 
 - **story-pointer**: Estimate complexity of the fix
 - **ticket-hygiene**: Validate ticket quality after creation
 - **ticket-triage**: Interactive triage session for deeper assessment
+
+## Notes
+
+- Do NOT use jira-cli or Bash for JIRA queries — use the mcp__atlassian__ MCP tools only

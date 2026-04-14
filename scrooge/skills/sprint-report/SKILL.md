@@ -3,14 +3,14 @@ name: sprint-report
 description: Daily sprint health report — progress, velocity, blockers, at-risk tickets,
   and team workload.
 allowed-tools:
-  - mcp__atlassian__search
-  - mcp__atlassian__get_issue
-  - mcp__atlassian__get_agile_boards
-  - mcp__atlassian__get_sprints_from_board
-  - mcp__atlassian__get_sprint_issues
-  - mcp__atlassian__get_board_issues
-  - mcp__atlassian__batch_get_changelogs
-  - mcp__atlassian__get_issue_dates
+  - mcp__atlassian__jira_search
+  - mcp__atlassian__jira_get_issue
+  - mcp__atlassian__jira_get_agile_boards
+  - mcp__atlassian__jira_get_sprints_from_board
+  - mcp__atlassian__jira_get_sprint_issues
+  - mcp__atlassian__jira_get_board_issues
+  - mcp__atlassian__jira_batch_get_changelogs
+  - mcp__atlassian__jira_get_issue_dates
 ---
 
 # Sprint Report: Daily Sprint Health
@@ -32,15 +32,15 @@ If neither field has a value, treat the issue as having 0 story points and note 
 
 ### 1. Find the Active Sprint
 
-- Use `mcp__atlassian__get_agile_boards` to find the board for project HYPERFLEET
-- Use `mcp__atlassian__get_sprints_from_board` to find the active sprint (state = "active")
+- Use `mcp__atlassian__jira_get_agile_boards` to find the board for project HYPERFLEET
+- Use `mcp__atlassian__jira_get_sprints_from_board` to find the active sprint (state = "active")
 - If no active sprint, report that and stop
 
 ### 2. Gather Sprint Data
 
-- Use `mcp__atlassian__get_sprint_issues` to pull all issues in the active sprint
+- Use `mcp__atlassian__jira_get_sprint_issues` to pull all issues in the active sprint
 - For each issue, note: key, summary, status, assignee, story points, priority, issue type
-- Use `mcp__atlassian__batch_get_changelogs` on sprint issues to detect recent status transitions (last 24h)
+- Use `mcp__atlassian__jira_batch_get_changelogs` on sprint issues to detect recent status transitions (last 24h)
 
 ### 3. Calculate Metrics
 

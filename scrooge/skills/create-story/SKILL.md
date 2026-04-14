@@ -1,14 +1,26 @@
 ---
 name: create-story
-description: Creates a JIRA Story with user story format, acceptance criteria, and technical notes. Activates when users ask to create a story or user story.
+description: Creates a JIRA Story with user story format, acceptance criteria, and
+  technical notes. Activates when users ask to create a story or user story.
+allowed-tools:
+  - mcp__atlassian__jira_create_issue
+  - mcp__atlassian__jira_get_issue
+  - mcp__atlassian__jira_get_project_components
+  - mcp__atlassian__jira_link_to_epic
+  - mcp__atlassian__jira_search
+  - mcp__atlassian__jira_search_fields
 ---
 
 # JIRA Story Creator
 
-## Configuration
+Uses `mcp__atlassian__*` MCP tools exclusively (not jira-cli).
 
-- `DUCKY_JIRA_PROJECT`: JIRA project key (default: `HYPERFLEET`)
-- `JIRA_BASE_URL`: JIRA instance URL (default: `https://redhat.atlassian.net`)
+## Custom Field Reference
+
+| Field ID | Name | Format |
+|----------|------|--------|
+| `customfield_10016` | Story point estimate | Number (0, 1, 3, 5, 8, 13) |
+| `customfield_10464` | Activity Type | `{"value": "Type Name"}` |
 
 ## Writing Style
 
@@ -21,17 +33,12 @@ If `qdrant-find` MCP tool is available, query for "ticket description" style sam
 - "I need a story for..."
 - "create a story for this feature"
 
-## JIRA Wiki Markup (NOT Markdown)
+## Description Format
 
-- Headers: `h3. Title` (space after period, never `###`)
-- Bullets: `* item`, nested: `** item` (never `-` or `•`)
-- Bold: `*bold*`, Italic: `_italic_`
-- Inline code: `{{code}}` (never backticks)
-- NO curly braces `{}` in content -- they break JIRA rendering (learned from HYPERFLEET-258 where `{customer-id}` broke the ticket). Use `:id` or SCREAMING_CASE instead.
-- API endpoints: `*POST* /api/v1/clusters/:id` (colon notation, never `/clusters/{id}`)
-- NO code blocks via CLI (renders as empty gray box -- add manually in web UI)
-- NO YAML comments in code blocks -- `#` is interpreted as `h1.` header
-- Always write descriptions to a temp file, never inline strings
+Write descriptions in **Markdown**. The MCP server converts to JIRA's native format automatically.
+
+- NO curly braces `{}` in content -- they break JIRA rendering. Use `:id` or SCREAMING_CASE instead.
+- API endpoints: `POST /api/v1/clusters/:id` (colon notation, never `/clusters/{id}`)
 
 ## Story Format
 
@@ -70,49 +77,56 @@ Ask the user if needed:
 - How will we know it's done? (Acceptance Criteria)
 - How complex is this? (Story Points)
 
-### Step 2: Create Description File
+### Step 2: Discover Valid Components
 
-```bash
-cat > /tmp/story-description.txt << 'EOF'
-h3. What
+Use `mcp__atlassian__jira_get_project_components` with `project_key: HYPERFLEET` to check available components.
+
+### Step 3: Create the Story
+
+Use `mcp__atlassian__jira_create_issue` with:
+- `project_key`: `HYPERFLEET`
+- `summary`: `Story title (< 100 chars)`
+- `issue_type`: `Story`
+- `description`: The story description in Markdown (see template below)
+- `components`: component name (if applicable)
+- `additional_fields`: JSON string with custom fields:
+  ```json
+  {
+    "priority": {"name": "Normal"},
+    "customfield_10016": 5,
+    "customfield_10464": {"value": "Product / Portfolio Work"}
+  }
+  ```
+
+### Description Template
+
+```markdown
+### What
 
 [User story or technical description. 2-4 sentences.]
 
-h3. Why
+### Why
 
-* [Reason 1 -- who benefits and how]
-* [Reason 2 -- what problem it solves]
+- [Reason 1 -- who benefits and how]
+- [Reason 2 -- what problem it solves]
 
-h3. Acceptance Criteria
+### Acceptance Criteria
 
-* [Given/When/Then or testable criterion 1]
-* [Criterion 2]
-* [Criterion 3]
+- [Given/When/Then or testable criterion 1]
+- [Criterion 2]
+- [Criterion 3]
 
-h3. Technical Notes
+### Technical Notes
 
-* Implementation approach: [brief description]
-* Files/components affected:
-** {{component-1}}
-** {{component-2}}
-* API/DB changes: [if any, or "None"]
+- Implementation approach: [brief description]
+- Files/components affected:
+  - `component-1`
+  - `component-2`
+- API/DB changes: [if any, or "None"]
 
-h3. Out of Scope
+### Out of Scope
 
-* [Explicit exclusion 1]
-EOF
-```
-
-### Step 3: Create via CLI
-
-```bash
-jira issue create --project ${DUCKY_JIRA_PROJECT:-HYPERFLEET} --type Story \
-  --summary "Story title (< 100 chars)" \
-  --custom story-points=5 \
-  --custom activity-type="Product / Portfolio Work" \
-  --priority Normal \
-  --no-input \
-  -b "$(cat /tmp/story-description.txt)"
+- [Explicit exclusion 1]
 ```
 
 **Activity type** defaults to "Product / Portfolio Work". Override when needed:
@@ -122,24 +136,13 @@ jira issue create --project ${DUCKY_JIRA_PROJECT:-HYPERFLEET} --type Story \
 
 Valid activity types: `Associate Wellness & Development`, `Incidents & Support`, `Security & Compliance`, `Quality / Stability / Reliability`, `Future Sustainability`, `Product / Portfolio Work`
 
-### Discovering Valid Components
-
-Before assigning a component, check what components exist in the project:
-```bash
-jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND component is not EMPTY" --plain 2>/dev/null | head -20
-```
-If you know the component, add `--component "ComponentName"` to the create command.
-
 ### Step 4: Post-Creation
 
-```bash
-jira issue view ${DUCKY_JIRA_PROJECT:-HYPERFLEET}-XXX --plain
-```
+Use `mcp__atlassian__jira_get_issue` to verify the ticket was created with all fields.
 
-Manual steps (via web UI):
-1. **Link to Epic**: Edit ticket > Link > "is child of" > Epic
-2. **Add Labels**: If applicable
-3. **Add Code Examples**: Code blocks don't render via CLI
+If the story belongs to an epic, use `mcp__atlassian__jira_link_to_epic` to link it:
+- `issue_key`: the new ticket key
+- `epic_key`: the parent epic key
 
 ## Output Format
 
@@ -154,26 +157,15 @@ Activity Type: [Type]
 Link: https://redhat.atlassian.net/browse/HYPERFLEET-XXX
 
 Manual steps needed:
-- Link to parent epic [if applicable]
 - Add labels [if applicable]
 ```
-
-## Troubleshooting
-
-### Story Points Not Setting
-Use exact syntax: `--custom story-points=X` where X is 0, 1, 3, 5, 8, or 13.
-
-### --body-file Flag
-Does not exist. Use `-b "$(cat /tmp/file.txt)"` instead.
-
-## Prerequisites
-
-If jira-cli is not installed or configured, inform the user they need to:
-1. Install jira-cli: `brew install ankitpokhrel/jira-cli/jira-cli`
-2. Configure it: `jira init`
 
 ## Integration
 
 - **story-pointer**: Detailed estimation methodology
 - **ticket-hygiene**: Validate ticket quality after creation
 - **ticket-triage**: Interactive triage session for deeper assessment
+
+## Notes
+
+- Do NOT use jira-cli or Bash for JIRA queries — use the mcp__atlassian__ MCP tools only

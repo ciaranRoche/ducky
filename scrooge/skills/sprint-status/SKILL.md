@@ -1,54 +1,60 @@
 ---
 name: sprint-status
 description: Sprint health overview for team leads - progress, blockers, and risks
-allowed-tools: Bash
+allowed-tools:
+  - mcp__atlassian__jira_search
+  - mcp__atlassian__jira_get_issue
+  - mcp__atlassian__jira_get_agile_boards
+  - mcp__atlassian__jira_get_sprints_from_board
+  - mcp__atlassian__jira_get_sprint_issues
+  - mcp__atlassian__jira_batch_get_changelogs
 argument-hint: [project-key]
 ---
 
 # Sprint Status (Team Lead View)
 
-Comprehensive sprint health report for team leads and scrum masters.
+Comprehensive sprint health report for team leads and scrum masters. Read-only — surfaces issues, never modifies tickets. Uses `mcp__atlassian__*` MCP tools exclusively (not jira-cli).
 
 ## Arguments
-- `$1` (optional): Project key. Defaults to `$DUCKY_JIRA_PROJECT` (or `HYPERFLEET` if unset).
+- `$1` (optional): Project key. Defaults to `HYPERFLEET`.
 
-## Instructions
+## Story Points Field Mapping
 
-1. **Get current sprint info:**
-   ```bash
-   jira sprint list --current -p ${DUCKY_JIRA_PROJECT:-HYPERFLEET} --plain 2>/dev/null
-   ```
+The JIRA instance stores story points in custom fields. When reading issue data from MCP tools, look for these fields (use the first one that has a value):
 
-2. **Get all tickets in current sprint (with full details):**
-   ```bash
-   jira sprint list --current -p ${DUCKY_JIRA_PROJECT:-HYPERFLEET} --raw 2>/dev/null
-   ```
+| Field ID | Name | Notes |
+|----------|------|-------|
+| `customfield_10016` | Story point estimate | Next-gen / Jira Software field — check this first |
+| `customfield_10028` | Story Points | Classic field |
 
-3. **Get tickets by status - To Do:**
-   ```bash
-   jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND status = 'To Do' AND sprint in openSprints()" --plain 2>/dev/null
-   ```
+If neither field has a value, treat the issue as having 0 story points and note it in the report.
 
-4. **Get tickets by status - In Progress:**
-   ```bash
-   jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND status = 'In Progress' AND sprint in openSprints()" --plain 2>/dev/null
-   ```
+## Behavior
 
-5. **Get tickets by status - Done (this sprint):**
-   ```bash
-   jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND status = Done AND sprint in openSprints()" --plain 2>/dev/null
-   ```
+### 1. Find the Active Sprint
 
-6. **Find blockers (high priority not done):**
-   ```bash
-   jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND priority = Highest AND status != Done" --plain 2>/dev/null
-   jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND priority = High AND status != Done" --plain 2>/dev/null
-   ```
+- Use `mcp__atlassian__jira_get_agile_boards` to find the board for the project
+- Use `mcp__atlassian__jira_get_sprints_from_board` to find the active sprint (state = "active")
+- If no active sprint, report that and stop
 
-7. **Find unassigned tickets:**
-   ```bash
-   jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND assignee is EMPTY AND sprint in openSprints()" --plain 2>/dev/null
-   ```
+### 2. Gather Sprint Data
+
+- Use `mcp__atlassian__jira_get_sprint_issues` to pull all issues in the active sprint
+- For each issue, note: key, summary, status, assignee, story points, priority, issue type
+- Group issues by status (To Do, In Progress, Done) from the returned data
+
+### 3. Identify Risks
+
+- **Blockers**: Use `mcp__atlassian__jira_search` with JQL: `project = HYPERFLEET AND priority in (Highest, High) AND status != Done AND sprint in openSprints()`
+- **Unassigned**: Filter sprint issues where assignee is null
+- **Stale in-progress**: Use `mcp__atlassian__jira_batch_get_changelogs` on in-progress issues to detect items without recent status changes
+- **Carry-over risk**: Issues in To Do with high story points late in the sprint
+
+### 4. Team Workload
+
+- Group issues by assignee from the sprint issues data
+- Show points assigned vs points completed per person
+- Flag anyone with disproportionate load or 0 completed points
 
 ## Output Format
 
@@ -94,6 +100,8 @@ Progress: [=========>    ] 65% complete
 - Highlight tickets needing attention
 - Suggest re-assignments if workload is unbalanced
 
-If jira-cli is not installed or configured, inform the user they need to:
-1. Install jira-cli: `brew install ankitpokhrel/jira-cli/jira-cli`
-2. Configure it: `jira init`
+## Notes
+
+- Apply the ghostwriter skill for tone
+- Keep the report scannable — tables over prose
+- Do NOT use jira-cli or Bash for JIRA queries — use the mcp__atlassian__ MCP tools only

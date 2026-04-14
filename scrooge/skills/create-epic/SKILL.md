@@ -1,14 +1,26 @@
 ---
 name: create-epic
-description: Creates a JIRA Epic with scope, success criteria, and child story breakdown. Activates when users ask to create an epic.
+description: Creates a JIRA Epic with scope, success criteria, and child story breakdown.
+  Activates when users ask to create an epic.
+allowed-tools:
+  - mcp__atlassian__jira_create_issue
+  - mcp__atlassian__jira_get_issue
+  - mcp__atlassian__jira_get_project_components
+  - mcp__atlassian__jira_search
+  - mcp__atlassian__jira_search_fields
 ---
 
 # JIRA Epic Creator
 
-## Configuration
+Uses `mcp__atlassian__*` MCP tools exclusively (not jira-cli).
 
-- `DUCKY_JIRA_PROJECT`: JIRA project key (default: `HYPERFLEET`)
-- `JIRA_BASE_URL`: JIRA instance URL (default: `https://redhat.atlassian.net`)
+## Custom Field Reference
+
+| Field ID | Name | Format |
+|----------|------|--------|
+| `customfield_10011` | Epic Name | String (short name, required for epics) |
+
+Epics do NOT get story points (they aggregate child story points) and do NOT get activity types (set on child stories instead).
 
 ## Writing Style
 
@@ -21,26 +33,12 @@ If `qdrant-find` MCP tool is available, query for "ticket description" style sam
 - "set up an epic for this feature area"
 - "create an epic to track..."
 
-## JIRA Wiki Markup (NOT Markdown)
+## Description Format
 
-- Headers: `h3. Title` (space after period, never `###`)
-- Bullets: `* item`, nested: `** item` (never `-` or `•`)
-- Bold: `*bold*`, Italic: `_italic_`
-- Inline code: `{{code}}` (never backticks)
-- NO curly braces `{}` in content -- they break JIRA rendering (learned from HYPERFLEET-258 where `{customer-id}` broke the ticket). Use `:id` or SCREAMING_CASE instead.
-- API endpoints: `*POST* /api/v1/clusters/:id` (colon notation, never `/clusters/{id}`)
-- NO code blocks via CLI (renders as empty gray box -- add manually in web UI)
-- NO YAML comments in code blocks -- `#` is interpreted as `h1.` header
-- Always write descriptions to a temp file, never inline strings
+Write descriptions in **Markdown**. The MCP server converts to JIRA's native format automatically.
 
-## Important: Epic-Specific CLI Differences
-
-Epics differ from other types in these critical ways:
-
-1. **Epics require `--custom epic-name="Short Name"`** -- this is a mandatory field
-2. **Epics use `--template` instead of `-b`** for the description body
-3. **Epics do NOT get story points** -- they aggregate child story points
-4. **Activity type is optional** for epics
+- NO curly braces `{}` in content -- they break JIRA rendering. Use `:id` or SCREAMING_CASE instead.
+- API endpoints: `POST /api/v1/clusters/:id` (colon notation, never `/clusters/{id}`)
 
 ## Workflow
 
@@ -53,96 +51,80 @@ Ask the user if needed:
 - What are the success criteria?
 - What are the known risks or dependencies?
 
-### Step 2: Create Description File
+### Step 2: Discover Valid Components
 
-```bash
-cat > /tmp/epic-description.txt << 'EOF'
-h1. Epic Title
+Use `mcp__atlassian__jira_get_project_components` with `project_key: HYPERFLEET` to check available components.
 
-h3. What
+### Step 3: Create the Epic
+
+Use `mcp__atlassian__jira_create_issue` with:
+- `project_key`: `HYPERFLEET`
+- `summary`: `Epic: Full Title Here`
+- `issue_type`: `Epic`
+- `description`: The epic description in Markdown (see template below)
+- `components`: component name (if applicable)
+- `additional_fields`: JSON string with custom fields:
+  ```json
+  {
+    "customfield_10011": "Short Name"
+  }
+  ```
+
+Notes:
+- `customfield_10011` (Epic Name) is **required** for epics
+- No `customfield_10016` -- epics aggregate child story points
+- No `customfield_10464` -- activity type is set on child stories
+
+### Description Template
+
+```markdown
+# Epic Title
+
+### What
 
 [What are we building? 2-3 sentences describing the deliverable.]
 
-h3. Why
+### Why
 
 [Why does this matter? 1-2 sentences on the problem it solves or value it delivers.]
 
-h3. Scope
+### Scope
 
-*In Scope:*
-* [Deliverable 1]
-* [Deliverable 2]
-* [Deliverable 3]
+**In Scope:**
+- [Deliverable 1]
+- [Deliverable 2]
+- [Deliverable 3]
 
-*Out of Scope:*
-* [Item 1]
-* [Item 2]
+**Out of Scope:**
+- [Item 1]
+- [Item 2]
 
-h3. Acceptance Criteria
+### Acceptance Criteria
 
-* [Criterion 1 -- observable outcome]
-* [Criterion 2]
-* [Criterion 3]
-* [Criterion 4]
-* [Criterion 5]
+- [Criterion 1 -- observable outcome]
+- [Criterion 2]
+- [Criterion 3]
+- [Criterion 4]
+- [Criterion 5]
 
-h3. Dependencies
+### Dependencies
 
-* Blocked by: [EPIC-XXX or "None"]
-* Blocks: [EPIC-XXX or "None"]
+- Blocked by: [EPIC-XXX or "None"]
+- Blocks: [EPIC-XXX or "None"]
 
-h3. Risks
+### Risks
 
-* [Risk 1]: [mitigation strategy]
-* [Risk 2]: [mitigation strategy]
+- [Risk 1]: [mitigation strategy]
+- [Risk 2]: [mitigation strategy]
 
-h3. Notes
+### Notes
 
 [Additional context, links to design docs, related research.]
-EOF
 ```
-
-### Step 3: Create via CLI
-
-**CRITICAL: Use `--template` for epics, NOT `-b "$(cat ...)"`**
-
-Why: Epic descriptions often contain wiki markup characters (`*`, `{`, `h1.`) that get
-mangled by shell expansion when passed through `-b "$(cat ...)"`. The `--template` flag
-reads the file directly, bypassing shell interpolation. Other issue types are shorter
-and simpler, so `-b "$(cat ...)"` works fine for them.
-
-```bash
-jira issue create --project ${DUCKY_JIRA_PROJECT:-HYPERFLEET} --type Epic \
-  --summary "Epic: Full Title Here" \
-  --custom epic-name="Short Name" \
-  --no-input \
-  --template /tmp/epic-description.txt
-```
-
-Notes:
-- `--custom epic-name="Short Name"` is REQUIRED (not `epicName`, not `customfield_12311141`)
-- `--template` reads the file directly (unlike `-b "$(cat ...)"` used by other types)
-- No `--custom story-points` -- epics aggregate child points
-- No `--custom activity-type` -- set on child stories instead
-
-### Discovering Valid Components
-
-Before assigning a component, check what components exist in the project:
-```bash
-jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND component is not EMPTY" --plain 2>/dev/null | head -20
-```
-If you know the component, add `--component "ComponentName"` to the create command.
 
 ### Step 4: Post-Creation
 
-```bash
-jira issue view ${DUCKY_JIRA_PROJECT:-HYPERFLEET}-XXX --plain
-```
-
-Manual steps (via web UI):
-1. **Link to Feature**: Edit ticket > Link > "is child of" > Feature (if applicable)
-2. **Add Labels**: e.g., component or theme labels
-3. **Add Code Examples**: Code blocks don't render via CLI
+Use `mcp__atlassian__jira_get_issue` to verify the ticket was created with all fields.
 
 ## Output Format
 
@@ -162,25 +144,14 @@ Manual steps needed:
 
 ## Troubleshooting
 
-### Epic Name Required Error
-```
-Error: customfield_12311141: Epic Name is required.
-```
-Use: `--custom epic-name="Short Name"` (not `epicName` or `customfield_12311141`)
-
-### Headers Not Rendering
-Ensure space after period: `h3. What` (not `h3.What`)
-
-### --body-file Flag
-Does not exist. For epics use `--template /tmp/file.txt`. For other types use `-b "$(cat /tmp/file.txt)"`.
-
-## Prerequisites
-
-If jira-cli is not installed or configured, inform the user they need to:
-1. Install jira-cli: `brew install ankitpokhrel/jira-cli/jira-cli`
-2. Configure it: `jira init`
+### Epic Name Not Setting
+Epic Name uses `customfield_10011` in `additional_fields`. Ensure it's passed as a plain string, not an object.
 
 ## Integration
 
 - **create-story**: Create child stories after epic is set up
 - **ticket-hygiene**: Validate epic quality
+
+## Notes
+
+- Do NOT use jira-cli or Bash for JIRA queries — use the mcp__atlassian__ MCP tools only

@@ -3,11 +3,11 @@ name: backlog-hygiene
 description: Weekly backlog audit — field completeness, staleness tiers, and duplicate
   detection.
 allowed-tools:
-  - mcp__atlassian__search
-  - mcp__atlassian__get_issue
-  - mcp__atlassian__get_project_components
-  - mcp__atlassian__batch_get_changelogs
-  - mcp__atlassian__get_issue_dates
+  - mcp__atlassian__jira_search
+  - mcp__atlassian__jira_get_issue
+  - mcp__atlassian__jira_get_project_components
+  - mcp__atlassian__jira_batch_get_changelogs
+  - mcp__atlassian__jira_get_issue_dates
 ---
 
 # Backlog Hygiene: Weekly Backlog Audit
@@ -29,7 +29,7 @@ If neither field has a value, treat the issue as unpointed.
 
 ### 1. Pull the Backlog
 
-Search using `mcp__atlassian__search` with JQL:
+Search using `mcp__atlassian__jira_search` with JQL:
 ```
 project = HYPERFLEET AND status != Done AND status != Closed AND (sprint not in openSprints() OR sprint is EMPTY) ORDER BY updated ASC
 ```
@@ -45,7 +45,7 @@ For each backlog issue, check these 6 fields:
 | **Description** | Exists and has meaningful content (> 20 chars) |
 | **Priority** | Set to something other than the default |
 | **Story points** | Assigned (for Stories and Bugs) |
-| **Component** | Set and valid (verify against `mcp__atlassian__get_project_components`) |
+| **Component** | Set and valid (verify against `mcp__atlassian__jira_get_project_components`) |
 | **Acceptance criteria** | Present in description for Stories |
 | **Issue type** | Not "Task" when it should be a Story or Bug |
 
@@ -62,7 +62,7 @@ Classify issues by time since last update:
 | **Cooling** | No updates in 30-59 days | Monitor |
 | **Active** | Updated within 30 days | No action needed |
 
-Use `mcp__atlassian__batch_get_changelogs` to check for meaningful updates (status changes, comment additions), not just field edits.
+Use `mcp__atlassian__jira_batch_get_changelogs` to check for meaningful updates (status changes, comment additions), not just field edits.
 
 ### 4. Duplicate Detection
 

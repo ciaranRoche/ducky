@@ -1,22 +1,33 @@
 ---
 name: ticket-triage
-description: Interactive triage session - collaboratively assess a ticket's validity, completeness, and sprint-readiness. Activates when users ask to "triage a ticket", "is this ticket ready?", or "walk me through this ticket".
+description: Interactive triage session - collaboratively assess a ticket's validity,
+  completeness, and sprint-readiness. Activates when users ask to "triage a ticket",
+  "is this ticket ready?", or "walk me through this ticket".
+allowed-tools:
+  - mcp__atlassian__jira_get_issue
+  - mcp__atlassian__jira_search
+  - mcp__atlassian__jira_update_issue
+  - mcp__atlassian__jira_get_project_components
+  - mcp__atlassian__jira_search_fields
 argument-hint: <ticket-key>
 ---
 
 # JIRA Ticket Triage
 
-Interactive triage session. Walk through a ticket together, assess whether it's actually ready for sprint, and fix issues along the way.
+Interactive triage session. Walk through a ticket together, assess whether it's actually ready for sprint, and fix issues along the way. Uses `mcp__atlassian__*` MCP tools exclusively (not jira-cli).
 
 This is not a field checklist -- that's `/ticket-hygiene`. This is a conversation about whether the ticket makes sense, has clear scope, and is ready to be picked up.
 
 ## Arguments
 - `$1`: Ticket key (e.g., HYPERFLEET-123). If omitted, ask the user.
 
-## Configuration
+## Custom Field Reference
 
-- `DUCKY_JIRA_PROJECT`: JIRA project key (default: `HYPERFLEET`)
-- `JIRA_BASE_URL`: JIRA instance URL (default: `https://redhat.atlassian.net`)
+| Field ID | Name | Notes |
+|----------|------|-------|
+| `customfield_10016` | Story point estimate | Next-gen — check first |
+| `customfield_10028` | Story Points | Classic fallback |
+| `customfield_10464` | Activity Type | Select dropdown |
 
 ## When to Use This Skill
 
@@ -40,15 +51,7 @@ Follow the conversational patterns from the pair-programmer skill:
 
 ### Step 1: Fetch and Ground
 
-Pull the ticket details and set the scene.
-
-```bash
-jira issue view TICKET-KEY --plain 2>/dev/null
-```
-
-```bash
-jira issue view TICKET-KEY --raw 2>/dev/null
-```
+Use `mcp__atlassian__jira_get_issue` with the ticket key to pull full details.
 
 Present a brief summary:
 - Title, type, status, assignee
@@ -63,14 +66,14 @@ Pick the question that fits -- if the ticket looks thin, lean toward scope. If i
 
 ### Step 2: Quick Hygiene Check
 
-Run the 6 required field checks inline (don't invoke ticket-hygiene, just check the fields from the data you already fetched):
+Run the 6 required field checks inline (from the data already fetched):
 
 1. Title: clear, actionable, under 100 characters
 2. Description: detailed (> 100 characters)
 3. Acceptance criteria: at least 2 testable criteria
-4. Story points: set (scale: 0, 1, 3, 5, 8, 13)
-5. Component: set and valid
-6. Activity type: set for capacity planning
+4. Story points: set (scale: 0, 1, 3, 5, 8, 13) — check `customfield_10016` then `customfield_10028`
+5. Component: set and valid — validate against `mcp__atlassian__jira_get_project_components`
+6. Activity type: set for capacity planning — check `customfield_10464`
 
 Report briefly: "Quick field check: 5/6 look good. Missing Activity Type. Want me to set that now, or dig into the content first?"
 
@@ -90,7 +93,7 @@ Work through these areas one at a time. Ask one question, wait for the user's re
 - "Could you explain what 'done' looks like for this in one sentence?"
 - "Are there implicit assumptions here that should be made explicit?"
 
-If the description is thin or vague, suggest improvements. Offer to update the description (using JIRA wiki markup, written to a temp file).
+If the description is thin or vague, suggest improvements. Offer to update the description.
 
 #### Acceptance Criteria Quality
 - "Are these criteria actually testable? Could QA write test cases from them?"
@@ -138,26 +141,15 @@ Throughout the assessment, when issues are found:
 1. Surface the concern clearly
 2. Suggest a specific fix
 3. Ask for confirmation before making changes
-4. Make the change using jira-cli
+4. Make the change using `mcp__atlassian__jira_update_issue`
 
 Common fixes:
-```bash
-# Set story points
-jira issue edit TICKET-KEY --custom story-points=X --no-input
+- **Set story points**: `fields: {"customfield_10016": X}`
+- **Set activity type**: `fields: {"customfield_10464": {"value": "Type Value"}}`
+- **Update description**: `fields: {"description": "Updated description in Markdown"}`
+- **Set component**: use the `components` parameter
 
-# Set activity type
-jira issue edit TICKET-KEY --custom activity-type="Type Value" --no-input
-
-# Update description (write to temp file first, then apply)
-jira issue edit TICKET-KEY -b "$(cat /tmp/updated-description.txt)" --no-input
-```
-
-**JIRA Wiki Markup reminders** (for any description updates):
-- Headers: `h3. Title` (space after period)
-- Bullets: `* item`, nested: `** item`
-- Bold: `*bold*`, Inline code: `{{code}}`
-- NO curly braces `{}` in content
-- Always write to temp file first
+**Description format**: Write descriptions in Markdown. The MCP server converts to JIRA's native format automatically.
 
 ### Step 5: Verdict
 
@@ -170,12 +162,6 @@ After walking through all areas (or the areas the user wanted to discuss), deliv
 
 End with any remaining action items and offer to check the next ticket if the user has more.
 
-## Prerequisites
-
-If jira-cli is not installed or configured, inform the user they need to:
-1. Install jira-cli: `brew install ankitpokhrel/jira-cli/jira-cli`
-2. Configure it: `jira init`
-
 ## Integration
 
 - **ticket-hygiene**: Mechanical field checks (complementary -- this skill runs them inline)
@@ -183,3 +169,7 @@ If jira-cli is not installed or configured, inform the user they need to:
 - **set-activity-type**: Set or change activity type when identified as missing
 - **story-pointer**: Detailed estimation if points need deeper analysis
 - **ghostwriter**: Tone and style for all written suggestions
+
+## Notes
+
+- Do NOT use jira-cli or Bash for JIRA queries — use the mcp__atlassian__ MCP tools only

@@ -1,24 +1,36 @@
 ---
 name: my-tasks
 description: List all your assigned JIRA tasks in the current project
-allowed-tools: Bash
+allowed-tools:
+  - mcp__atlassian__jira_search
+  - mcp__atlassian__jira_get_issue
 ---
 
 # My Tasks
 
-Show all JIRA tickets currently assigned to the user in the configured project.
+Show all JIRA tickets currently assigned to the user in the configured project. Uses `mcp__atlassian__*` MCP tools exclusively (not jira-cli).
 
-## Instructions
+## Story Points Field Mapping
 
-1. **Get all assigned tickets (recent, sorted by updated):**
-   ```bash
-   jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND assignee = currentUser()" --order-by updated --reverse --plain 2>/dev/null
-   ```
+The JIRA instance stores story points in custom fields. When reading issue data from MCP tools, look for these fields (use the first one that has a value):
 
-2. **For more detail with JSON output:**
-   ```bash
-   jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND assignee = currentUser()" --order-by updated --reverse --raw 2>/dev/null | head -100
-   ```
+| Field ID | Name | Notes |
+|----------|------|-------|
+| `customfield_10016` | Story point estimate | Next-gen / Jira Software field — check this first |
+| `customfield_10028` | Story Points | Classic field |
+
+## Behavior
+
+### 1. Fetch Assigned Tickets
+
+Use `mcp__atlassian__jira_search` with JQL:
+```
+project = HYPERFLEET AND assignee = currentUser() ORDER BY updated DESC
+```
+
+### 2. Get Details if Needed
+
+For tickets that need more detail, use `mcp__atlassian__jira_get_issue` to fetch full fields.
 
 ## Output Format
 
@@ -50,6 +62,7 @@ Present tickets grouped by status:
 - Flag high-priority tickets that need attention
 - Note any tickets missing story points
 
-If jira-cli is not installed or configured, inform the user they need to:
-1. Install jira-cli: `brew install ankitpokhrel/jira-cli/jira-cli`
-2. Configure it: `jira init`
+## Notes
+
+- Apply the ghostwriter skill for tone
+- Do NOT use jira-cli or Bash for JIRA queries — use the mcp__atlassian__ MCP tools only

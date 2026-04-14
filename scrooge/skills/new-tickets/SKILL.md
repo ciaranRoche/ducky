@@ -3,9 +3,9 @@ name: new-tickets
 description: Daily scan of tickets created in the last 24 hours — grooming quality
   assessment.
 allowed-tools:
-  - mcp__atlassian__search
-  - mcp__atlassian__get_issue
-  - mcp__atlassian__get_project_components
+  - mcp__atlassian__jira_search
+  - mcp__atlassian__jira_get_issue
+  - mcp__atlassian__jira_get_project_components
 ---
 
 # New Tickets: Daily Grooming Quality Check
@@ -16,7 +16,7 @@ Scan for tickets created in the last 24 hours and assess their grooming quality.
 
 ### 1. Find New Tickets
 
-Search using `mcp__atlassian__search` with JQL:
+Search using `mcp__atlassian__jira_search` with JQL:
 ```
 project = HYPERFLEET AND created >= -24h ORDER BY created DESC
 ```
@@ -25,7 +25,7 @@ If no tickets found, report that and stop.
 
 ### 2. Assess Each Ticket
 
-For each new ticket, use `mcp__atlassian__get_issue` to read full details, then check:
+For each new ticket, use `mcp__atlassian__jira_get_issue` to read full details, then check:
 
 **Required fields:**
 - Summary (not generic like "Bug" or "Fix thing")
@@ -55,7 +55,7 @@ For **Epics:**
 
 **General quality:**
 - Story points assigned
-- Component set (verify against `mcp__atlassian__get_project_components`)
+- Component set (verify against `mcp__atlassian__jira_get_project_components`)
 - Labels present
 - Sprint assigned
 

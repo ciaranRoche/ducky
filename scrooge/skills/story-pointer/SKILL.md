@@ -1,15 +1,29 @@
 ---
 name: story-pointer
-description: Estimates story points for JIRA tickets by analyzing complexity, scope, and comparing to historical team data. Activates when users ask to estimate, point, or size a ticket, or ask "how many points should this be?"
+description: Estimates story points for JIRA tickets by analyzing complexity, scope,
+  and comparing to historical team data. Activates when users ask to estimate, point,
+  or size a ticket, or ask "how many points should this be?"
+allowed-tools:
+  - mcp__atlassian__jira_get_issue
+  - mcp__atlassian__jira_search
+  - mcp__atlassian__jira_update_issue
+  - mcp__atlassian__jira_search_fields
 ---
 
 # JIRA Story Point Estimator Skill
 
-## Configuration
+Uses `mcp__atlassian__*` MCP tools exclusively (not jira-cli).
 
-This skill uses environment variables for project configuration:
-- `DUCKY_JIRA_PROJECT`: JIRA project key (default: `HYPERFLEET`)
-- `JIRA_BASE_URL`: JIRA instance URL (default: `https://redhat.atlassian.net`)
+## Story Points Field Mapping
+
+The JIRA instance stores story points in custom fields. When reading or writing story points, use these fields:
+
+| Field ID | Name | Notes |
+|----------|------|-------|
+| `customfield_10016` | Story point estimate | Next-gen / Jira Software field — check this first |
+| `customfield_10028` | Story Points | Classic field |
+
+When reading, use the first field that has a value. When writing, set `customfield_10016`.
 
 ## When to Use This Skill
 
@@ -38,9 +52,7 @@ Team uses a modified Fibonacci sequence for story points:
 
 ### Step 1: Fetch Ticket Details
 
-```bash
-jira issue view TICKET-KEY --plain 2>/dev/null
-```
+Use `mcp__atlassian__jira_get_issue` with the ticket key to get full details.
 
 ### Step 2: Analyze Complexity Factors
 
@@ -66,14 +78,10 @@ jira issue view TICKET-KEY --plain 2>/dev/null
 
 ### Step 3: Find Similar Historical Tickets
 
-Search for comparable completed tickets:
+Search for comparable completed tickets using `mcp__atlassian__jira_search`:
 
-```bash
-jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND status = Done AND type = Story" --plain 2>/dev/null | head -20
 ```
-
-```bash
-jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND status = Done AND 'Story Points' is not EMPTY AND type = Story" --plain 2>/dev/null | head -20
+project = HYPERFLEET AND status = Done AND type = Story AND "Story Points" is not EMPTY ORDER BY updated DESC
 ```
 
 ### Step 4: Provide Estimation
@@ -129,17 +137,9 @@ jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND status = Done
 
 ## Setting Story Points
 
-Once agreed, set story points using:
-
-```bash
-jira issue edit TICKET-KEY --custom story-points=X --no-input
-```
-
-Or for Story Point Estimate field (Next-gen projects):
-
-```bash
-jira issue edit TICKET-KEY --custom story-point-estimate=X --no-input
-```
+Once agreed, set story points using `mcp__atlassian__jira_update_issue`:
+- `issue_key`: the ticket key
+- `fields`: `{"customfield_10016": X}` where X is 0, 1, 3, 5, 8, or 13
 
 ## Team Calibration Notes
 
@@ -157,8 +157,6 @@ When estimating, consider:
 - **Planning Fallacy**: Add buffer for unknowns
 - **Story Point Inflation**: Keep consistent with team baseline
 
-## Prerequisites
+## Notes
 
-If jira-cli is not installed or configured, inform the user they need to:
-1. Install jira-cli: `brew install ankitpokhrel/jira-cli/jira-cli`
-2. Configure it: `jira init`
+- Do NOT use jira-cli or Bash for JIRA queries — use the mcp__atlassian__ MCP tools only

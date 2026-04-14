@@ -1,15 +1,30 @@
 ---
 name: ticket-hygiene
-description: Validates JIRA tickets have required fields and quality standards. Mechanical field checks for sprint readiness.
+description: Validates JIRA tickets have required fields and quality standards. Mechanical
+  field checks for sprint readiness.
+allowed-tools:
+  - mcp__atlassian__jira_get_issue
+  - mcp__atlassian__jira_get_project_components
+  - mcp__atlassian__jira_search_fields
+  - mcp__atlassian__jira_search
 ---
 
 # JIRA Ticket Hygiene Check
 
-## Configuration
+Uses `mcp__atlassian__*` MCP tools exclusively (not jira-cli).
 
-This skill uses environment variables for project configuration:
-- `DUCKY_JIRA_PROJECT`: JIRA project key (default: `HYPERFLEET`)
-- `JIRA_BASE_URL`: JIRA instance URL (default: `https://redhat.atlassian.net`)
+## Story Points Field Mapping
+
+| Field ID | Name | Notes |
+|----------|------|-------|
+| `customfield_10016` | Story point estimate | Next-gen / Jira Software field — check this first |
+| `customfield_10028` | Story Points | Classic field |
+
+## Activity Type Field
+
+| Field ID | Name | Notes |
+|----------|------|-------|
+| `customfield_10464` | Activity Type | Select dropdown |
 
 ## When to Use This Skill
 
@@ -46,30 +61,17 @@ Activate when the user:
 - Dependencies identified and linked
 - Scope is achievable in one sprint
 
-## Components
-
-Components are project-specific. Verify valid components for your project:
-```bash
-jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND component is not EMPTY" --plain 2>/dev/null | head -20
-```
-Check that tickets use components defined in the project settings.
-
 ## How to Check a Ticket
 
-Use jira-cli to fetch ticket details:
+### Step 1: Fetch Ticket Details
 
-```bash
-jira issue view TICKET-KEY --plain 2>/dev/null
-```
+Use `mcp__atlassian__jira_get_issue` with the ticket key. The response includes all fields in structured JSON.
 
-For JSON output with all fields:
-```bash
-jira issue view TICKET-KEY --raw 2>/dev/null
-```
+### Step 2: Validate Components
+
+Use `mcp__atlassian__jira_get_project_components` with `project_key: HYPERFLEET` to get the list of valid components. Check that the ticket's component is in this list.
 
 ## Output Format
-
-When analyzing a ticket, provide:
 
 ### Ticket: TICKET-KEY
 
@@ -135,14 +137,12 @@ Activity Type is **required** for sprint/kanban capacity planning. Tickets witho
 - **Missing Activity Type** (appears as Uncategorized in capacity planning)
 - **Invalid Component** (must be a valid component for the configured project)
 
-## Prerequisites
-
-If jira-cli is not installed or configured, inform the user they need to:
-1. Install jira-cli: `brew install ankitpokhrel/jira-cli/jira-cli`
-2. Configure it: `jira init`
-
 ## Integration
 
 - **sprint-hygiene**: Bulk audit of sprint tickets
 - **ticket-triage**: Interactive deep-dive on ticket validity and sprint-readiness
 - **set-activity-type**: Set or change activity type when missing
+
+## Notes
+
+- Do NOT use jira-cli or Bash for JIRA queries — use the mcp__atlassian__ MCP tools only

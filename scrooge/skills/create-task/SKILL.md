@@ -1,14 +1,27 @@
 ---
 name: create-task
-description: Creates a JIRA Task for tech debt, infrastructure, documentation, or spike work. Activates when users ask to create a task, spike, tech debt ticket, or infrastructure work.
+description: Creates a JIRA Task for tech debt, infrastructure, documentation, or
+  spike work. Activates when users ask to create a task, spike, tech debt ticket, or
+  infrastructure work.
+allowed-tools:
+  - mcp__atlassian__jira_create_issue
+  - mcp__atlassian__jira_get_issue
+  - mcp__atlassian__jira_get_project_components
+  - mcp__atlassian__jira_link_to_epic
+  - mcp__atlassian__jira_search
+  - mcp__atlassian__jira_search_fields
 ---
 
 # JIRA Task Creator
 
-## Configuration
+Uses `mcp__atlassian__*` MCP tools exclusively (not jira-cli).
 
-- `DUCKY_JIRA_PROJECT`: JIRA project key (default: `HYPERFLEET`)
-- `JIRA_BASE_URL`: JIRA instance URL (default: `https://redhat.atlassian.net`)
+## Custom Field Reference
+
+| Field ID | Name | Format |
+|----------|------|--------|
+| `customfield_10016` | Story point estimate | Number (0, 1, 3, 5, 8, 13) |
+| `customfield_10464` | Activity Type | `{"value": "Type Name"}` |
 
 ## Writing Style
 
@@ -22,17 +35,12 @@ If `qdrant-find` MCP tool is available, query for "ticket description" style sam
 - "tech debt ticket for...", "create a tech debt item"
 - "infrastructure task", "documentation task"
 
-## JIRA Wiki Markup (NOT Markdown)
+## Description Format
 
-- Headers: `h3. Title` (space after period, never `###`)
-- Bullets: `* item`, nested: `** item` (never `-` or `•`)
-- Bold: `*bold*`, Italic: `_italic_`
-- Inline code: `{{code}}` (never backticks)
-- NO curly braces `{}` in content -- they break JIRA rendering (learned from HYPERFLEET-258 where `{customer-id}` broke the ticket). Use `:id` or SCREAMING_CASE instead.
-- API endpoints: `*POST* /api/v1/clusters/:id` (colon notation, never `/clusters/{id}`)
-- NO code blocks via CLI (renders as empty gray box -- add manually in web UI)
-- NO YAML comments in code blocks -- `#` is interpreted as `h1.` header
-- Always write descriptions to a temp file, never inline strings
+Write descriptions in **Markdown**. The MCP server converts to JIRA's native format automatically.
+
+- NO curly braces `{}` in content -- they break JIRA rendering. Use `:id` or SCREAMING_CASE instead.
+- API endpoints: `POST /api/v1/clusters/:id` (colon notation, never `/clusters/{id}`)
 
 ## Task Sub-Types
 
@@ -65,87 +73,88 @@ Ask the user if needed:
 - Is this a spike? (determines template)
 - How complex is this? (Story Points)
 
-### Step 2: Create Description File
+### Step 2: Discover Valid Components
 
-**Default Template (tech debt / infra / docs):**
+Use `mcp__atlassian__jira_get_project_components` with `project_key: HYPERFLEET` to check available components.
 
-```bash
-cat > /tmp/task-description.txt << 'EOF'
-h3. What
+### Step 3: Create the Task
+
+Use `mcp__atlassian__jira_create_issue` with:
+- `project_key`: `HYPERFLEET`
+- `summary`: `Task title (< 100 chars)` — for spikes, prefix with `[SPIKE]`
+- `issue_type`: `Task`
+- `description`: The task description in Markdown (see templates below)
+- `components`: component name (if applicable)
+- `additional_fields`: JSON string with custom fields:
+  ```json
+  {
+    "priority": {"name": "Normal"},
+    "customfield_10016": 3,
+    "customfield_10464": {"value": "Future Sustainability"}
+  }
+  ```
+
+### Default Template (tech debt / infra / docs)
+
+```markdown
+### What
 
 [What needs to be done. 2-3 sentences.]
 
-h3. Why
+### Why
 
-* [Business or technical impact]
-* [What problem this solves]
+- [Business or technical impact]
+- [What problem this solves]
 
-h3. Current State
+### Current State
 
 [What is problematic now -- the pain point or gap.]
 
-h3. Desired State
+### Desired State
 
 [What we want instead -- the target outcome.]
 
-h3. Acceptance Criteria
+### Acceptance Criteria
 
-* [Specific, testable criterion 1]
-* [Criterion 2]
-* [Criterion 3]
+- [Specific, testable criterion 1]
+- [Criterion 2]
+- [Criterion 3]
 
-h3. Technical Approach
+### Technical Approach
 
-* [How this will be accomplished]
-* Files/components affected:
-** {{component-1}}
-** {{component-2}}
-EOF
+- [How this will be accomplished]
+- Files/components affected:
+  - `component-1`
+  - `component-2`
 ```
 
-**Spike Template (investigations / research / PoCs):**
+### Spike Template (investigations / research / PoCs)
 
-```bash
-cat > /tmp/task-description.txt << 'EOF'
-h3. Research Question
+```markdown
+### Research Question
 
 [What we need to answer. Be specific.]
 
-h3. Why
+### Why
 
-* [Why this investigation matters]
-* [What decisions depend on the outcome]
+- [Why this investigation matters]
+- [What decisions depend on the outcome]
 
-h3. Time Box
+### Time Box
 
 [Max time to spend, e.g., "3 days" or "1 sprint"]
 
-h3. Deliverable
+### Deliverable
 
 [What the output should be: report, recommendation, PoC, ADR, etc.]
 
-h3. Acceptance Criteria
+### Acceptance Criteria
 
-* Research questions answered with evidence
-* Deliverable produced and shared with team
-* Recommendation documented with trade-offs
-* Next steps identified
-EOF
+- Research questions answered with evidence
+- Deliverable produced and shared with team
+- Recommendation documented with trade-offs
+- Next steps identified
 ```
-
-### Step 3: Create via CLI
-
-```bash
-jira issue create --project ${DUCKY_JIRA_PROJECT:-HYPERFLEET} --type Task \
-  --summary "Task title (< 100 chars)" \
-  --custom story-points=3 \
-  --custom activity-type="Future Sustainability" \
-  --priority Normal \
-  --no-input \
-  -b "$(cat /tmp/task-description.txt)"
-```
-
-For spikes, prefix the summary: `--summary "[SPIKE] Research question summary"`
 
 **Activity type** defaults to "Future Sustainability". Override when needed:
 - Refactoring/quality work: "Quality / Stability / Reliability"
@@ -154,23 +163,13 @@ For spikes, prefix the summary: `--summary "[SPIKE] Research question summary"`
 
 Valid activity types: `Associate Wellness & Development`, `Incidents & Support`, `Security & Compliance`, `Quality / Stability / Reliability`, `Future Sustainability`, `Product / Portfolio Work`
 
-### Discovering Valid Components
-
-Before assigning a component, check what components exist in the project:
-```bash
-jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND component is not EMPTY" --plain 2>/dev/null | head -20
-```
-If you know the component, add `--component "ComponentName"` to the create command.
-
 ### Step 4: Post-Creation
 
-```bash
-jira issue view ${DUCKY_JIRA_PROJECT:-HYPERFLEET}-XXX --plain
-```
+Use `mcp__atlassian__jira_get_issue` to verify the ticket was created with all fields.
 
-Manual steps (via web UI):
-1. **Link to Epic**: Edit ticket > Link > "is child of" > Epic
-2. **Add Labels**: e.g., `tech-debt`, `spike`, `infrastructure`
+If the task belongs to an epic, use `mcp__atlassian__jira_link_to_epic` to link it:
+- `issue_key`: the new ticket key
+- `epic_key`: the parent epic key
 
 ## Output Format
 
@@ -185,26 +184,15 @@ Activity Type: [Type]
 Link: https://redhat.atlassian.net/browse/HYPERFLEET-XXX
 
 Manual steps needed:
-- Link to parent epic [if applicable]
 - Add labels [if applicable]
 ```
-
-## Troubleshooting
-
-### Story Points Not Setting
-Use exact syntax: `--custom story-points=X` where X is 0, 1, 3, 5, 8, or 13.
-
-### --body-file Flag
-Does not exist. Use `-b "$(cat /tmp/file.txt)"` instead.
-
-## Prerequisites
-
-If jira-cli is not installed or configured, inform the user they need to:
-1. Install jira-cli: `brew install ankitpokhrel/jira-cli/jira-cli`
-2. Configure it: `jira init`
 
 ## Integration
 
 - **story-pointer**: Estimate task complexity
 - **ticket-hygiene**: Validate ticket quality after creation
 - **ticket-triage**: Interactive triage session for deeper assessment
+
+## Notes
+
+- Do NOT use jira-cli or Bash for JIRA queries — use the mcp__atlassian__ MCP tools only

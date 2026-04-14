@@ -1,15 +1,24 @@
 ---
 name: set-activity-type
-description: Sets or changes the Activity Type on an existing JIRA ticket for capacity planning. Activates when users ask to set, change, or add activity type to a ticket.
+description: Sets or changes the Activity Type on an existing JIRA ticket for capacity
+  planning. Activates when users ask to set, change, or add activity type to a ticket.
+allowed-tools:
+  - mcp__atlassian__jira_get_issue
+  - mcp__atlassian__jira_search
+  - mcp__atlassian__jira_update_issue
+  - mcp__atlassian__jira_search_fields
 argument-hint: <ticket-key> [activity-type]
 ---
 
 # JIRA Activity Type Setter
 
-## Configuration
+Uses `mcp__atlassian__*` MCP tools exclusively (not jira-cli).
 
-- `DUCKY_JIRA_PROJECT`: JIRA project key (default: `HYPERFLEET`)
-- `JIRA_BASE_URL`: JIRA instance URL (default: `https://redhat.atlassian.net`)
+## Activity Type Field
+
+| Field ID | Name | Notes |
+|----------|------|-------|
+| `customfield_10464` | Activity Type | Select dropdown — set as `{"customfield_10464": {"value": "Type Name"}}` |
 
 ## When to Use This Skill
 
@@ -51,11 +60,7 @@ Activity Type is **required** for sprint/kanban capacity planning. Tickets witho
 
 ### Step 1: Fetch Ticket Details
 
-```bash
-jira issue view TICKET-KEY --plain 2>/dev/null
-```
-
-Review the ticket's summary, type, description, and current fields to understand what category of work it represents.
+Use `mcp__atlassian__jira_get_issue` with the ticket key to review the ticket's summary, type, description, and current fields.
 
 ### Step 2: Determine Activity Type
 
@@ -76,15 +81,13 @@ Present your recommendation with reasoning and ask the user to confirm before se
 
 ### Step 3: Set Activity Type
 
-```bash
-jira issue edit TICKET-KEY --custom activity-type="Activity Type Value" --no-input
-```
+Use `mcp__atlassian__jira_update_issue`:
+- `issue_key`: the ticket key
+- `fields`: `{"customfield_10464": {"value": "Activity Type Value"}}`
 
 ### Step 4: Verify
 
-```bash
-jira issue view TICKET-KEY --plain 2>/dev/null
-```
+Use `mcp__atlassian__jira_get_issue` to confirm the field was set correctly.
 
 ## Output Format
 
@@ -101,17 +104,12 @@ Link: https://redhat.atlassian.net/browse/TICKET-KEY
 
 If the user asks to set activity types for multiple tickets or a sprint's worth of tickets, find tickets missing activity type first:
 
-```bash
-jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND 'Activity Type' is EMPTY AND sprint in openSprints()" --plain 2>/dev/null
+Use `mcp__atlassian__jira_search` with JQL:
+```
+project = HYPERFLEET AND "Activity Type" is EMPTY AND sprint in openSprints()
 ```
 
 Then process each ticket individually, recommending and confirming with the user before setting.
-
-## Prerequisites
-
-If jira-cli is not installed or configured, inform the user they need to:
-1. Install jira-cli: `brew install ankitpokhrel/jira-cli/jira-cli`
-2. Configure it: `jira init`
 
 ## Integration
 
@@ -119,3 +117,7 @@ If jira-cli is not installed or configured, inform the user they need to:
 - **sprint-hygiene**: Bulk audit flags tickets missing Activity Type
 - **ticket-triage**: Interactive triage may identify missing Activity Type
 - **create-story / create-bug / create-task**: Set Activity Type at creation time
+
+## Notes
+
+- Do NOT use jira-cli or Bash for JIRA queries — use the mcp__atlassian__ MCP tools only

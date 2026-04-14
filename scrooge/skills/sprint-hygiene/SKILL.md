@@ -1,14 +1,22 @@
 ---
 name: sprint-hygiene
-description: Audit sprint tickets for hygiene - required fields, components, and duplicate detection
-allowed-tools: Bash
+description: Audit sprint tickets for hygiene - required fields, components, and duplicate
+  detection
+allowed-tools:
+  - mcp__atlassian__jira_search
+  - mcp__atlassian__jira_get_issue
+  - mcp__atlassian__jira_get_agile_boards
+  - mcp__atlassian__jira_get_sprints_from_board
+  - mcp__atlassian__jira_get_sprint_issues
+  - mcp__atlassian__jira_get_project_components
+  - mcp__atlassian__jira_search_fields
 argument-hint: [scope: sprint|backlog|all]
 disable-model-invocation: true
 ---
 
 # Sprint Hygiene Check
 
-Audit JIRA tickets for sprint readiness, including required fields, valid components, and potential duplicates.
+Audit JIRA tickets for sprint readiness, including required fields, valid components, and potential duplicates. Read-only — surfaces issues, never modifies tickets. Uses `mcp__atlassian__*` MCP tools exclusively (not jira-cli).
 
 ## Arguments
 - `$1` (optional): Scope of check
@@ -16,63 +24,56 @@ Audit JIRA tickets for sprint readiness, including required fields, valid compon
   - `backlog`: Backlog items
   - `all`: All recent tickets
 
-## Instructions
+## Story Points Field Mapping
 
-1. **Get tickets to audit (current sprint by default):**
-   ```bash
-   jira sprint list --current -p ${DUCKY_JIRA_PROJECT:-HYPERFLEET} --raw 2>/dev/null
-   ```
+| Field ID | Name | Notes |
+|----------|------|-------|
+| `customfield_10016` | Story point estimate | Next-gen / Jira Software field — check this first |
+| `customfield_10028` | Story Points | Classic field |
 
-2. **CRITICAL - Check for potential duplicates:**
-   ```bash
-   # Search backlog for similar titles - run for each ticket being checked
-   jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND status != Done AND summary ~ 'keyword'" --plain 2>/dev/null
-   ```
+## Activity Type Field
 
-3. **Find tickets without story points:**
-   ```bash
-   jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND 'Story Points' is EMPTY AND sprint in openSprints() AND issuetype in (Story, Task, Bug)" --plain 2>/dev/null
-   ```
+| Field ID | Name | Notes |
+|----------|------|-------|
+| `customfield_10464` | Activity Type | Select dropdown |
 
-4. **Find tickets with minimal description:**
-   ```bash
-   jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND sprint in openSprints() AND description is EMPTY" --plain 2>/dev/null
-   ```
+## Behavior
 
-5. **Find tickets without components:**
-   ```bash
-   jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND component is EMPTY AND sprint in openSprints()" --plain 2>/dev/null
-   ```
+### 1. Get Tickets to Audit
 
-   Verify assigned components are valid by cross-referencing against known components:
-   ```bash
-   jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND component is not EMPTY" --plain 2>/dev/null | head -20
-   ```
+**Sprint scope (default):**
+- Use `mcp__atlassian__jira_get_agile_boards` to find the board for project HYPERFLEET
+- Use `mcp__atlassian__jira_get_sprints_from_board` to find the active sprint
+- Use `mcp__atlassian__jira_get_sprint_issues` to pull all sprint issues
 
-6. **Find tickets without Activity Type:**
-   ```bash
-   jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND 'Activity Type' is EMPTY AND sprint in openSprints()" --plain 2>/dev/null
-   ```
+**Backlog scope:**
+- Use `mcp__atlassian__jira_search` with JQL: `project = HYPERFLEET AND status != Done AND status != Closed AND (sprint not in openSprints() OR sprint is EMPTY) ORDER BY updated ASC`
 
-7. **Find stale tickets (no updates in 7+ days):**
-   ```bash
-   jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND sprint in openSprints() AND status != Done AND updated < -7d" --plain 2>/dev/null
-   ```
+### 2. Check for Potential Duplicates (CRITICAL)
 
-8. **Find tickets without labels (recommended):**
-   ```bash
-   jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND labels is EMPTY AND sprint in openSprints()" --plain 2>/dev/null
-   ```
+For each ticket, use `mcp__atlassian__jira_search` to search for similar titles:
+```
+project = HYPERFLEET AND status != Done AND summary ~ "keyword"
+```
+Run for each ticket being checked, using key terms from the summary.
 
-9. **For detailed ticket inspection (check Title, Acceptance Criteria):**
-   ```bash
-   jira issue view TICKET-KEY --plain 2>/dev/null
-   ```
+### 3. Field Completeness Checks
 
-   When inspecting individual tickets, verify:
-   - **Title**: Clear, actionable, under 100 characters
-   - **Acceptance Criteria**: At least 2 clear, testable criteria in description
-   - **No ambiguous language**: Check for "maybe", "probably", "TBD", "possibly"
+For each ticket (using data from sprint issues or `mcp__atlassian__jira_get_issue` for full details):
+
+- **Missing Story Points**: Check `customfield_10016` and `customfield_10028` — flag if both are empty (for Stories, Tasks, Bugs)
+- **Missing/Inadequate Description**: Check description field exists and has > 50 characters
+- **Missing Components**: Check components array — validate against `mcp__atlassian__jira_get_project_components`
+- **Missing Activity Type**: Check `customfield_10464` is set
+- **Stale Tickets**: Flag issues with `updated` older than 7 days
+- **Missing Labels**: Check labels array
+
+### 4. Individual Ticket Inspection
+
+For tickets needing deeper checks, use `mcp__atlassian__jira_get_issue` to verify:
+- **Title**: Clear, actionable, under 100 characters
+- **Acceptance Criteria**: At least 2 clear, testable criteria in description
+- **No ambiguous language**: Check for "maybe", "probably", "TBD", "possibly"
 
 ## Output Format
 
@@ -112,7 +113,7 @@ Audit JIRA tickets for sprint readiness, including required fields, valid compon
 | TICKET-1 | [Summary] | None |
 | TICKET-2 | [Summary] | InvalidComponent |
 
-**Valid Components:** Check project settings for valid components.
+**Valid Components:** Verify against `mcp__atlassian__jira_get_project_components`.
 
 **Action Required:** Assign valid component for tracking.
 
@@ -167,6 +168,6 @@ Audit JIRA tickets for sprint readiness, including required fields, valid compon
 2. [Second priority]
 3. [Third priority]
 
-If jira-cli is not installed or configured, inform the user they need to:
-1. Install jira-cli: `brew install ankitpokhrel/jira-cli/jira-cli`
-2. Configure it: `jira init`
+## Notes
+
+- Do NOT use jira-cli or Bash for JIRA queries — use the mcp__atlassian__ MCP tools only

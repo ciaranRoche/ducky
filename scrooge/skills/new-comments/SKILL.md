@@ -1,24 +1,29 @@
 ---
 name: new-comments
 description: Find tickets with new comments you may have missed
-allowed-tools: Bash
+allowed-tools:
+  - mcp__atlassian__jira_search
+  - mcp__atlassian__jira_get_issue
 ---
 
 # New Comments
 
-Find JIRA tickets with recent comments that the user should be aware of.
+Find JIRA tickets with recent comments that the user should be aware of. Read-only — surfaces issues, never modifies tickets. Uses `mcp__atlassian__*` MCP tools exclusively (not jira-cli).
 
-## Instructions
+## Behavior
 
-1. **Find tickets you're involved with that have recent comments:**
-   ```bash
-   jira issue list -q"project = ${DUCKY_JIRA_PROJECT:-HYPERFLEET} AND (assignee = currentUser() OR reporter = currentUser() OR watcher = currentUser()) AND updated >= -1d" --order-by updated --reverse --plain 2>/dev/null
-   ```
+### 1. Find Tickets with Recent Activity
 
-2. **View specific ticket to see comments (for each relevant ticket):**
-   ```bash
-   jira issue view TICKET-KEY --comments 5 --plain 2>/dev/null
-   ```
+Use `mcp__atlassian__jira_search` with JQL:
+```
+project = HYPERFLEET AND (assignee = currentUser() OR reporter = currentUser() OR watcher = currentUser()) AND updated >= -1d ORDER BY updated DESC
+```
+
+### 2. Check Comments on Each Ticket
+
+For each ticket returned, use `mcp__atlassian__jira_get_issue` to retrieve full details including comments.
+
+Filter to tickets that have comments added in the relevant time window.
 
 ## Output Format
 
@@ -42,7 +47,5 @@ For each ticket with new comments:
 - If user specifies a different timeframe (e.g., "last week"), adjust the JQL accordingly
 - Highlight any comments that directly mention the user
 - Flag urgent/blocking discussions
-
-If jira-cli is not installed or configured, inform the user they need to:
-1. Install jira-cli: `brew install ankitpokhrel/jira-cli/jira-cli`
-2. Configure it: `jira init`
+- Apply the ghostwriter skill for tone
+- Do NOT use jira-cli or Bash for JIRA queries — use the mcp__atlassian__ MCP tools only
