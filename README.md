@@ -1,5 +1,9 @@
 # ducky
 
+<p align="center">
+  <img src="ducky.png" alt="ducky" width="300">
+</p>
+
 Personal AI pair programming toolkit for Claude Code. Four persona-based plugins themed after cartoon ducks, all in your writing style.
 
 ## Plugins
@@ -12,16 +16,6 @@ Personal AI pair programming toolkit for Claude Code. Four persona-based plugins
 | **webby** | Webby Vanderquack | Obsidian second brain, daily notes, session logging, vault search |
 
 Install only what you need. Each plugin is self-contained.
-
-## Prerequisites
-
-- [Claude Code](https://claude.ai/claude-code) CLI
-- [gh](https://cli.github.com/) (GitHub CLI) — for darkwing
-- [jira-cli](https://github.com/ankitpokhrel/jira-cli) (`jira init`) — for scrooge skills
-- [mcp-atlassian](https://github.com/sooperset/mcp-atlassian) (`uvx mcp-atlassian`) — for scrooge agents
-- [Qdrant](https://qdrant.tech/) on `localhost:6333` (optional, for writing style RAG)
-- [mcp-server-qdrant](https://github.com/qdrant/mcp-server-qdrant) (optional, MCP bridge)
-- [MCPVault](https://github.com/bitbonsai/mcpvault) (`npm install -g @bitbonsai/mcpvault`) — for webby
 
 ## Setup
 
@@ -36,20 +30,21 @@ Install only what you need. Each plugin is self-contained.
    claude plugin install darkwing@ducky
    claude plugin install webby@ducky
    ```
-3. Set up vault access (for webby):
-   ```bash
-   # Run /webby:vault-setup inside Claude Code, or manually:
-   claude mcp add obsidian --scope user -- npx @bitbonsai/mcpvault@latest /path/to/your/vault
-   ```
-4. Set environment variables (for scrooge):
-   - `DUCKY_JIRA_PROJECT` — JIRA project key (default: `HYPERFLEET`)
-   - `JIRA_BASE_URL` — JIRA instance URL (default: `https://issues.redhat.com`)
-   - `JIRA_USERNAME` — Atlassian email (for mcp-atlassian skills)
-   - `JIRA_API_TOKEN` — Atlassian API token (for mcp-atlassian skills)
 
-If using writing style RAG:
-1. Start Qdrant: `docker run -p 6333:6333 qdrant/qdrant`
-2. Store writing samples with the `qdrant-store` MCP tool
+### Plugin-specific setup
+
+**scrooge** requires [mcp-atlassian](https://github.com/sooperset/mcp-atlassian) and two environment variables:
+- `JIRA_USERNAME` — Atlassian email
+- `JIRA_API_TOKEN` — Atlassian API token
+
+**darkwing** requires [gh](https://cli.github.com/) (GitHub CLI).
+
+**webby** requires an Obsidian vault. Run `/webby:vault-setup` inside Claude Code, or manually:
+```bash
+claude mcp add obsidian --scope user -- npx @bitbonsai/mcpvault@latest /path/to/your/vault
+```
+
+**Writing style RAG** (optional, all plugins): Start [Qdrant](https://qdrant.tech/) on `localhost:6333` and install [mcp-server-qdrant](https://github.com/qdrant/mcp-server-qdrant). Store writing samples with the `qdrant-store` MCP tool.
 
 ## Skills
 
@@ -61,32 +56,28 @@ If using writing style RAG:
 | `/ducky:brainstorm [topic]` | Structured brainstorming with thinking frameworks |
 | `/ducky:research [topic]` | Technical research with synthesized findings |
 
-Background: **ghostwriter** (writing style), **pair-programmer** (Socratic questioning engine)
-Agent: **researcher** (autonomous deep-dive research)
-
 ### scrooge (JIRA ops)
 
 | Skill | Description |
 |-------|-------------|
-| `/scrooge:create-story` | User stories with acceptance criteria |
 | `/scrooge:create-bug` | Bug reports with steps to reproduce |
+| `/scrooge:create-story` | User stories with acceptance criteria |
 | `/scrooge:create-task` | Tech debt, spikes, infrastructure work |
-| `/scrooge:create-epic` | Epics with child story breakdown |
+| `/scrooge:create-epic` | Epics with scope and child story breakdown |
 | `/scrooge:create-feature` | Portfolio-level initiatives with benefit hypothesis |
 | `/scrooge:ticket-creator` | Routes to the correct creator by type |
 | `/scrooge:story-pointer` | Estimate story points with complexity analysis |
-| `/scrooge:ticket-triage` | Validate a ticket's sprint readiness |
-| `/scrooge:triage [scope]` | Bulk audit sprint tickets for completeness |
+| `/scrooge:set-activity-type` | Set activity type for capacity planning |
+| `/scrooge:ticket-triage` | Interactive triage — assess and fix ticket readiness |
+| `/scrooge:ticket-hygiene` | Validate required fields on a specific ticket |
+| `/scrooge:sprint-hygiene [scope]` | Bulk audit sprint tickets for completeness |
 | `/scrooge:my-sprint` | Current sprint and your assigned tickets |
 | `/scrooge:my-tasks` | All your assigned JIRA tasks |
 | `/scrooge:new-comments` | Tickets with new comments you may have missed |
 | `/scrooge:sprint-status` | Sprint health overview for team leads |
-
 | `/scrooge:sprint-report` | Sprint health — progress, velocity, blockers |
 | `/scrooge:new-tickets` | New ticket grooming quality assessment |
 | `/scrooge:backlog-hygiene` | Backlog audit — staleness, field checks, duplicates |
-
-Background: **ghostwriter** (writing style), **scrooge** (persona behavioral patterns)
 
 ### darkwing (GitHub ops)
 
@@ -101,24 +92,18 @@ Background: **ghostwriter** (writing style), **scrooge** (persona behavioral pat
 | `/darkwing:pr-status [PR]` | Check CI, reviews, and merge readiness |
 | `/darkwing:issues [action]` | GitHub issue management |
 
-Background: **ghostwriter** (writing style), **darkwing** (persona behavioral patterns)
-
 ### webby (second brain)
 
 | Skill | Description |
 |-------|-------------|
 | `/webby:daily` | Read today's daily note — surface todos and context |
-| `/webby:todo <add\|done\|pick>` | Manage todos — add items, mark done, or pick one to focus on |
-| `/webby:work` | Pick a daily todo and start working on it with Claude |
+| `/webby:todo <add\|done\|pick>` | Manage todos — add items, mark done, or pick one |
+| `/webby:work` | Pick a daily todo and start working on it |
 | `/webby:session-log [summary]` | Append session summary to today's daily note |
 | `/webby:vault-query <topic>` | Search vault for relevant context |
 | `/webby:vault-save <topic>` | File new knowledge into the vault |
 | `/webby:vault-setup [path]` | Configure MCPVault for cross-project vault access |
 
-Background: **ghostwriter** (writing style), **webby** (persona behavioral patterns)
-
 ## Customization
 
-The ghostwriter skill (in each plugin's `skills/ghostwriter/SKILL.md`) contains writing style examples and rules. Edit these to match your own voice, tone, and formatting preferences.
-
-For RAG-based style matching, store samples in Qdrant using the `qdrant-store` MCP tool.
+Each plugin includes a **ghostwriter** skill (`skills/ghostwriter/SKILL.md`) with writing style examples and rules. Edit these to match your own voice.
