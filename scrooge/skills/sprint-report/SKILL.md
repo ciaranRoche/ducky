@@ -28,6 +28,11 @@ The JIRA instance stores story points in custom fields. When reading issue data 
 
 If neither field has a value, treat the issue as having 0 story points and note it in the report.
 
+**Important:** These custom fields are NOT returned by default by MCP tools. When calling `mcp__atlassian__jira_get_sprint_issues`, `mcp__atlassian__jira_search`, or `mcp__atlassian__jira_get_issue`, you **must** include them in the `fields` parameter:
+```
+fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,customfield_10016,customfield_10028"
+```
+
 ## Behavior
 
 ### 1. Find the Active Sprint

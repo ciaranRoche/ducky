@@ -25,6 +25,11 @@ The JIRA instance stores story points in custom fields. When reading or writing 
 
 When reading, use the first field that has a value. When writing, set `customfield_10016`.
 
+**Important:** These custom fields are NOT returned by default by MCP tools. When calling `mcp__atlassian__jira_get_issue` or `mcp__atlassian__jira_search`, you **must** include them in the `fields` parameter:
+```
+fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,customfield_10016,customfield_10028"
+```
+
 ## When to Use This Skill
 
 Activate this skill when the user:

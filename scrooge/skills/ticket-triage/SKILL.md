@@ -29,6 +29,11 @@ This is not a field checklist -- that's `/ticket-hygiene`. This is a conversatio
 | `customfield_10028` | Story Points | Classic fallback |
 | `customfield_10464` | Activity Type | Select dropdown |
 
+**Important:** These custom fields are NOT returned by default by MCP tools. When calling `mcp__atlassian__jira_get_issue` or `mcp__atlassian__jira_search`, you **must** include them in the `fields` parameter:
+```
+fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,customfield_10016,customfield_10028,customfield_10464"
+```
+
 ## When to Use This Skill
 
 - "triage TICKET-KEY", "triage this ticket"

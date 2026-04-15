@@ -31,6 +31,11 @@ Audit JIRA tickets for sprint readiness, including required fields, valid compon
 | `customfield_10016` | Story point estimate | Next-gen / Jira Software field — check this first |
 | `customfield_10028` | Story Points | Classic field |
 
+**Important:** These custom fields are NOT returned by default by MCP tools. When calling `mcp__atlassian__jira_get_sprint_issues`, `mcp__atlassian__jira_search`, or `mcp__atlassian__jira_get_issue`, you **must** include them in the `fields` parameter:
+```
+fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,customfield_10016,customfield_10028,customfield_10464"
+```
+
 ## Activity Type Field
 
 | Field ID | Name | Notes |
