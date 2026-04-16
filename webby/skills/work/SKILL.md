@@ -11,30 +11,40 @@ argument-hint: ''
 
 # Work: Pick a Todo and Start
 
-Pick an open todo from today's daily note and begin working on it. Bridges Obsidian todos into an active Claude work session.
+Pick an open todo from today's daily note or the kanban board and begin working on it. Bridges Obsidian into an active Claude work session.
 
 ## Phase 1 — Select
 
 1. **Get today's date** using `date +%Y-%m-%d` via Bash
 2. **Read today's daily note** at `Daily/YYYY-MM-DD.md` using `mcp__obsidian__read_note`
-3. **If the note does not exist**, tell the user and suggest `/webby:todo add` or `/webby:daily` to get started. Do not create it.
-4. **Collect all unchecked `- [ ]` items** from both todo sections:
+3. **Read the kanban board** at `Work/Kanban.md` using `mcp__obsidian__read_note`. If the board does not exist, skip kanban items silently.
+4. **Collect tasks from both sources:**
+
+   **Daily note** — unchecked `- [ ]` items from:
    - `#### What do I want to do today or tomorrow?` (personal)
    - `#### Work To Dos` (work)
    - Skip blank placeholders (items where the text after `- [ ] ` is empty or whitespace-only)
-5. **If no unchecked items exist**, tell the user and suggest `/webby:todo add` to create some
-6. **Present as a numbered list** with section labels:
+
+   **Kanban board** — parse columns by splitting on `## ` headings (content before `%% kanban:settings`):
+   - Collect unchecked `- [ ]` items from the "In Progress" column first (already active)
+   - Then collect unchecked `- [ ]` items from the first column (Backlog)
+
+5. **If no items from either source**, tell the user and suggest `/webby:todo add` or `/webby:kanban add`
+6. **Present as a numbered list** with source labels:
 
 ```
 ### Open Tasks
 
-**Personal:**
+**Daily Note:**
 1. Buy groceries
-
-**Work:**
 2. Disaster recovery
-3. MCP debug server for Hyperfleet
-4. Review PR #55
+
+**Kanban — In Progress:**
+3. [[DB Long Transactions]]
+
+**Kanban — Backlog:**
+4. [[IC Team Setup]]
+5. [[Design API spec]]
 
 Pick a number to start working on.
 ```
@@ -45,7 +55,7 @@ Pick a number to start working on.
 
 Once the user selects a task:
 
-1. **Log the selection** to `#### Log` using `mcp__obsidian__patch_note`:
+1. **Log the selection** to today's daily note `#### Log` using `mcp__obsidian__patch_note`:
    - Extract the exact content between `#### Log` and `#### A day in review`
    - Append `- Started: [item description]`
    - If the log section only contains the placeholder (`- `), replace it
@@ -64,18 +74,23 @@ Once the user selects a task:
 
    **Fallback:** If `patch_note` fails, fall back to `mcp__obsidian__write_note` with `mode: "append"` and tell the user the entry was appended to the end of the file.
 
-2. **Search the vault for context** using `mcp__obsidian__search_notes` with the selected item's text as the query (`searchContent: true`, limit 5). If relevant notes are found:
+2. **If the selected task is from the kanban board:**
+   - If the task is not already in "In Progress", move it there by patching `Work/Kanban.md` (remove from source column, add to In Progress — same patch logic as `/webby:kanban move`)
+   - Read the linked task note if it exists (parse `new-note-folder` from board settings, look for `<new-note-folder>/<task name>.md`). Surface `### What` and `#### Log` sections as context.
+   - Log `- YYYY-MM-DD: Started` to the task note's `#### Log` section using `mcp__obsidian__patch_note`
+
+3. **Search the vault for context** using `mcp__obsidian__search_notes` with the selected item's text as the query (`searchContent: true`, limit 5). If relevant notes are found:
    - Read the top 2-3 most relevant notes
    - Surface a brief summary (2-3 sentences max) with `[[wiki-links]]`
    - Only show notes that are clearly related — skip tangential matches
    - If nothing relevant is found, skip this step silently
 
-3. **Ask one grounding question** tailored to the task type:
+4. **Ask one grounding question** tailored to the task type:
    - **Vague task** (e.g., "Disaster recovery", "Refactor auth"): "What specifically needs to happen here? Is this research, writing, code, or something else?"
    - **References a ticket or PR** (e.g., "Review PR #55", "JIRA-123"): "Want me to pull that up and get started?"
    - **Clearly actionable** (e.g., "Fix DNS resolution in mesh config"): "Any specific context or constraints I should know before diving in?"
 
-4. Wait for the user's response
+5. Wait for the user's response
 
 ## Phase 3 — Execute
 

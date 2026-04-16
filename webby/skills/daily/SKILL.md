@@ -49,6 +49,18 @@ Present a clean, scannable summary. Do not dump the raw markdown. Example:
 
 If there are no items in a section, omit that section entirely.
 
+### Kanban Active Items
+
+After presenting the daily note sections, also read the kanban board at `Work/Kanban.md` using `mcp__obsidian__read_note`. If the board exists, parse the "In Progress" column (split content on `## ` headings, content before `%% kanban:settings`) and show active items:
+
+```
+**Kanban — Active:** (2 in progress)
+- [[DB Long Transactions]]
+- [[Design API spec]]
+```
+
+If the board does not exist or the "In Progress" column is empty, omit this section silently.
+
 ## Notes
 
 - The daily note path is always `Daily/YYYY-MM-DD.md` with no subdirectories
