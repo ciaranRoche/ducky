@@ -5,6 +5,7 @@ description: Validates JIRA tickets have required fields and quality standards. 
 allowed-tools:
   - mcp__atlassian__jira_get_issue
   - mcp__atlassian__jira_get_project_components
+  - mcp__atlassian__jira_get_project_versions
   - mcp__atlassian__jira_search_fields
   - mcp__atlassian__jira_search
 ---
@@ -22,7 +23,7 @@ Uses `mcp__atlassian__*` MCP tools exclusively (not jira-cli).
 
 **Important:** These custom fields are NOT returned by default by MCP tools. When calling `mcp__atlassian__jira_get_issue`, you **must** include them in the `fields` parameter:
 ```
-fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,customfield_10016,customfield_10028,customfield_10464"
+fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,fixVersions,customfield_10016,customfield_10028,customfield_10464"
 ```
 
 ## Activity Type Field
@@ -94,6 +95,16 @@ Use `mcp__atlassian__jira_get_project_components` with `project_key: HYPERFLEET`
 | Activity Type | PASS/FAIL | [Type or "Uncategorized"] |
 
 #### Overall Score: X/6 Required Checks Passed
+
+#### Recommended Fields
+| Field | Status | Notes |
+|-------|--------|-------|
+| Fix Version | SET/MISSING | [Version name or "No target release"] |
+| Labels | SET/MISSING | [Count or "None"] |
+| Epic Link | SET/MISSING | [Epic key or "Not linked"] |
+| Priority | SET/MISSING | [Value] |
+
+These are informational — not counted in the required score. Fix Version indicates whether the ticket is tied to a specific release. Use `mcp__atlassian__jira_get_project_versions` to validate version names against the project.
 
 #### Verdict
 - **ALL CLEAR** - All required fields present, good quality

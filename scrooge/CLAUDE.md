@@ -30,6 +30,15 @@ skills/          Slash commands and reusable capabilities (SKILL.md files)
 | `customfield_10011` | Epic Name | String | Required when creating epics |
 | `customfield_10014` | Epic Link | Any | Links issues to parent epics |
 
+## Fix Version
+
+Fix Version (`fixVersions`) is a standard JIRA field — not a custom field. It ties issues to a specific release. All hygiene and audit skills surface missing Fix Versions as an informational highlight (not a required field gate).
+
+- **Querying:** Include `fixVersions` in the `fields` parameter when fetching issues
+- **Setting:** `fields: {"fixVersions": [{"name": "Version Name"}]}`
+- **Validating:** Use `mcp__atlassian__jira_get_project_versions` with `project_key: HYPERFLEET` to get available versions
+- **Release planning:** Use `/scrooge:release-prep` to assess readiness of a specific Fix Version
+
 ## Discovering Valid Components
 
 Use `mcp__atlassian__jira_get_project_components` with `project_key: HYPERFLEET` to get the list of valid components. Check that any component you assign is one the project actually uses.
@@ -50,6 +59,7 @@ All skills use `mcp__atlassian__jira_*` MCP tools.
 | `/scrooge:backlog-hygiene` | Full backlog audit — field checks, staleness, duplicates |
 | `/scrooge:ticket-hygiene` | Validate required fields on a specific ticket |
 | `/scrooge:sprint-hygiene` | Bulk sprint audit — fields, components, duplicates |
+| `/scrooge:release-prep` | Release readiness — progress, risks, and sprint planning priorities by Fix Version |
 
 ### Read+Write Skills
 | Skill | Purpose |

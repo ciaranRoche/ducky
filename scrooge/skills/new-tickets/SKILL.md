@@ -27,7 +27,7 @@ If no tickets found, report that and stop.
 
 For each new ticket, use `mcp__atlassian__jira_get_issue` to read full details. You **must** pass the `fields` parameter to include story point custom fields, which are not returned by default:
 ```
-fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,customfield_10016,customfield_10028"
+fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,fixVersions,customfield_10016,customfield_10028,customfield_10464"
 ```
 Then check:
 
@@ -62,6 +62,8 @@ For **Epics:**
 - Component set (verify against `mcp__atlassian__jira_get_project_components`)
 - Labels present
 - Sprint assigned
+- Fix Version set (target release identified)
+- Activity Type set (capacity planning)
 
 ### 3. Score and Classify
 

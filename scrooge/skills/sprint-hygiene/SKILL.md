@@ -9,6 +9,7 @@ allowed-tools:
   - mcp__atlassian__jira_get_sprints_from_board
   - mcp__atlassian__jira_get_sprint_issues
   - mcp__atlassian__jira_get_project_components
+  - mcp__atlassian__jira_get_project_versions
   - mcp__atlassian__jira_search_fields
 argument-hint: [scope: sprint|backlog|all]
 disable-model-invocation: true
@@ -33,7 +34,7 @@ Audit JIRA tickets for sprint readiness, including required fields, valid compon
 
 **Important:** These custom fields are NOT returned by default by MCP tools. When calling `mcp__atlassian__jira_get_sprint_issues`, `mcp__atlassian__jira_search`, or `mcp__atlassian__jira_get_issue`, you **must** include them in the `fields` parameter:
 ```
-fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,customfield_10016,customfield_10028,customfield_10464"
+fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,fixVersions,customfield_10016,customfield_10028,customfield_10464"
 ```
 
 ## Activity Type Field
@@ -132,6 +133,15 @@ For tickets needing deeper checks, use `mcp__atlassian__jira_get_issue` to verif
 **Valid Activity Types:** Associate Wellness & Development, Incidents & Support, Security & Compliance, Quality / Stability / Reliability, Future Sustainability, Product / Portfolio Work
 
 **Action Required:** Set Activity Type for capacity planning.
+
+---
+
+#### Missing Fix Version
+| Ticket | Summary | Type | Priority |
+|--------|---------|------|----------|
+| TICKET-1 | [Summary] | Story | High |
+
+**Note:** Fix Version is informational, not a required field. Items without a Fix Version may not be tied to a specific release. Use `mcp__atlassian__jira_get_project_versions` to see available versions.
 
 ---
 

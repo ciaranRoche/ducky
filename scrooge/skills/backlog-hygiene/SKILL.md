@@ -6,6 +6,7 @@ allowed-tools:
   - mcp__atlassian__jira_search
   - mcp__atlassian__jira_get_issue
   - mcp__atlassian__jira_get_project_components
+  - mcp__atlassian__jira_get_project_versions
   - mcp__atlassian__jira_batch_get_changelogs
   - mcp__atlassian__jira_get_issue_dates
 ---
@@ -27,7 +28,7 @@ If neither field has a value, treat the issue as unpointed.
 
 **Important:** These custom fields are NOT returned by default by MCP tools. When calling `mcp__atlassian__jira_search` or `mcp__atlassian__jira_get_issue`, you **must** include them in the `fields` parameter:
 ```
-fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,customfield_10016,customfield_10028"
+fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,fixVersions,customfield_10016,customfield_10028,customfield_10464"
 ```
 
 ## Behavior
@@ -86,6 +87,7 @@ Calculate overall metrics:
 - Distribution across staleness tiers
 - Number of potential duplicates
 - Issues with 0 story points (for Stories/Bugs)
+- Fix Version coverage: count of issues with vs without a Fix Version (informational — not all items need one)
 
 ## Output Format
 
@@ -99,6 +101,7 @@ Calculate overall metrics:
 | Fully groomed (6/6) | X | Y% |
 | Needs work (3-5/6) | X | Y% |
 | Incomplete (0-2/6) | X | Y% |
+| Has Fix Version | X | Y% |
 
 ### Staleness
 | Tier | Count | Oldest |

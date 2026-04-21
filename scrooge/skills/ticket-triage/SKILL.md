@@ -8,6 +8,7 @@ allowed-tools:
   - mcp__atlassian__jira_search
   - mcp__atlassian__jira_update_issue
   - mcp__atlassian__jira_get_project_components
+  - mcp__atlassian__jira_get_project_versions
   - mcp__atlassian__jira_search_fields
 argument-hint: <ticket-key>
 ---
@@ -31,7 +32,7 @@ This is not a field checklist -- that's `/ticket-hygiene`. This is a conversatio
 
 **Important:** These custom fields are NOT returned by default by MCP tools. When calling `mcp__atlassian__jira_get_issue` or `mcp__atlassian__jira_search`, you **must** include them in the `fields` parameter:
 ```
-fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,customfield_10016,customfield_10028,customfield_10464"
+fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,fixVersions,customfield_10016,customfield_10028,customfield_10464"
 ```
 
 ## When to Use This Skill
@@ -61,6 +62,7 @@ Use `mcp__atlassian__jira_get_issue` with the ticket key to pull full details.
 Present a brief summary:
 - Title, type, status, assignee
 - Story points (if set), component, activity type
+- Fix Version (if set)
 
 Then ask a grounding question to start the conversation:
 - "What's your take on this one -- does the scope feel right?"
@@ -81,6 +83,10 @@ Run the 6 required field checks inline (from the data already fetched):
 6. Activity type: set for capacity planning — check `customfield_10464`
 
 Report briefly: "Quick field check: 5/6 look good. Missing Activity Type. Want me to set that now, or dig into the content first?"
+
+Also note Fix Version status (informational, not counted in the 6-field score):
+- If set: "Fix Version: [version]"
+- If not set: "Fix Version: not set"
 
 If everything passes: "Fields look clean -- let's talk about the content."
 
@@ -139,6 +145,12 @@ Use these signals to recommend:
 | CVE, vulnerability, compliance | Security & Compliance |
 | Escalation, outage, support | Incidents & Support |
 | Training, onboarding, mentorship | Associate Wellness & Development |
+
+#### Release Targeting
+- If Fix Version is set: "This targets [version] — does that timeline still make sense?"
+- If Fix Version is missing: "No Fix Version set. Is this tied to a specific release, or is it general backlog?"
+- If the user wants to set a Fix Version, validate against `mcp__atlassian__jira_get_project_versions` before setting
+- Set via `mcp__atlassian__jira_update_issue` with `fields: {"fixVersions": [{"name": "Version Name"}]}`
 
 ### Step 4: Fix Along the Way
 
