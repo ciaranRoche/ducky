@@ -37,10 +37,12 @@ Run this before sprint planning to anchor the conversation around release delive
 |----------|------|-------|
 | `customfield_10464` | Activity Type | Select dropdown |
 
-**Important:** These custom fields are NOT returned by default by MCP tools. When calling `mcp__atlassian__jira_search` or `mcp__atlassian__jira_get_issue`, you **must** include them in the `fields` parameter:
+**Important:** These custom fields are NOT returned by default by MCP tools. When calling `mcp__atlassian__jira_search`, `mcp__atlassian__jira_get_issue`, or `mcp__atlassian__jira_get_sprint_issues`, you **must** include them in the `fields` parameter:
 ```
 fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,fixVersions,customfield_10016,customfield_10028,customfield_10464"
 ```
+
+**Every query in this skill that fetches issues must pass this `fields` parameter.** Without it, story points and activity type will be missing from the response.
 
 ## Behavior
 
@@ -67,13 +69,18 @@ Search using `mcp__atlassian__jira_search` with JQL:
 project = HYPERFLEET AND fixVersion = "VERSION_NAME" ORDER BY priority ASC, status ASC
 ```
 
+**You must pass the `fields` parameter** to include story points and activity type:
+```
+fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,fixVersions,customfield_10016,customfield_10028,customfield_10464"
+```
+
 Paginate if needed (use `startAt` parameter). Pull all issues — this is the full release scope.
 
 ### 3. Determine Active Sprint Context
 
 - Use `mcp__atlassian__jira_get_agile_boards` to find the board for project HYPERFLEET
 - Use `mcp__atlassian__jira_get_sprints_from_board` to find the active sprint (state = "active")
-- Use `mcp__atlassian__jira_get_sprint_issues` to get active sprint issue keys
+- Use `mcp__atlassian__jira_get_sprint_issues` to get active sprint issue keys (pass the `fields` parameter to include custom fields)
 - Cross-reference: for each release issue, note whether it is currently in the active sprint
 
 ### 4. Classify Issues
