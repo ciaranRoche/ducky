@@ -11,7 +11,7 @@ Personal AI pair programming toolkit for Claude Code. Four persona-based plugins
 | Plugin | Persona | What It Does |
 |--------|---------|--------------|
 | **ducky** | The rubber duck | Debugging, brainstorming, research, Socratic questioning |
-| **scrooge** | Scrooge McDuck | JIRA ticket creation, triage, sprint tracking, estimation |
+| **scrooge** | Scrooge McDuck | JIRA ticket creation, triage, hygiene, sprint/release reporting, planning |
 | **darkwing** | Darkwing Duck | GitHub PRs, structured code review pipeline, issue management |
 | **webby** | Webby Vanderquack | Obsidian second brain, daily notes, session logging, vault search |
 
@@ -60,24 +60,23 @@ claude mcp add obsidian --scope user -- npx @bitbonsai/mcpvault@latest /path/to/
 
 | Skill | Description |
 |-------|-------------|
+| `/scrooge:ticket-triage <key>` | Interactive triage — validate, assess, and fix ticket readiness |
+| `/scrooge:hygiene <key>\|sprint` | Field completeness and quality checks (single ticket or sprint) |
+| `/scrooge:daily-report` | Daily briefing — sprint progress, new tickets, new comments |
+| `/scrooge:sprint-report` | Sprint health — burn rate, risks, workload, carry-over |
+| `/scrooge:release-status [version]` | Release readiness by Fix Version |
+| `/scrooge:sprint-planning` | Sprint planning prep — candidates, stale items, capacity |
+| `/scrooge:backlog-grooming` | Backlog audit — staleness, field checks, duplicates |
+| `/scrooge:my-sprint` | Current sprint and your assigned tickets |
+| `/scrooge:my-tasks` | All your assigned JIRA tasks |
+| `/scrooge:story-pointer <key>` | Estimate story points with complexity analysis |
+| `/scrooge:set-activity-type <key>` | Set activity type for capacity planning |
+| `/scrooge:ticket-creator` | Routes to the correct creator by type |
 | `/scrooge:create-bug` | Bug reports with steps to reproduce |
 | `/scrooge:create-story` | User stories with acceptance criteria |
 | `/scrooge:create-task` | Tech debt, spikes, infrastructure work |
 | `/scrooge:create-epic` | Epics with scope and child story breakdown |
 | `/scrooge:create-feature` | Portfolio-level initiatives with benefit hypothesis |
-| `/scrooge:ticket-creator` | Routes to the correct creator by type |
-| `/scrooge:story-pointer` | Estimate story points with complexity analysis |
-| `/scrooge:set-activity-type` | Set activity type for capacity planning |
-| `/scrooge:ticket-triage` | Interactive triage — assess and fix ticket readiness |
-| `/scrooge:ticket-hygiene` | Validate required fields on a specific ticket |
-| `/scrooge:sprint-hygiene [scope]` | Bulk audit sprint tickets for completeness |
-| `/scrooge:my-sprint` | Current sprint and your assigned tickets |
-| `/scrooge:my-tasks` | All your assigned JIRA tasks |
-| `/scrooge:new-comments` | Tickets with new comments you may have missed |
-| `/scrooge:sprint-status` | Sprint health overview for team leads |
-| `/scrooge:sprint-report` | Sprint health — progress, velocity, blockers |
-| `/scrooge:new-tickets` | New ticket grooming quality assessment |
-| `/scrooge:backlog-hygiene` | Backlog audit — staleness, field checks, duplicates |
 
 ### darkwing (GitHub ops)
 
@@ -90,6 +89,7 @@ claude mcp add obsidian --scope user -- npx @bitbonsai/mcpvault@latest /path/to/
 | `/darkwing:review-verdict [PR]` | Round 4: Synthesize findings into verdict |
 | `/darkwing:pr-create [base]` | Create a PR with structured description |
 | `/darkwing:pr-status [PR]` | Check CI, reviews, and merge readiness |
+| `/darkwing:pr-feedback [PR]` | Step through open review threads, fixing code or replying |
 | `/darkwing:issues [action]` | GitHub issue management |
 
 ### webby (second brain)
@@ -103,6 +103,8 @@ claude mcp add obsidian --scope user -- npx @bitbonsai/mcpvault@latest /path/to/
 | `/webby:vault-query <topic>` | Search vault for relevant context |
 | `/webby:vault-save <topic>` | File new knowledge into the vault |
 | `/webby:vault-setup [path]` | Configure MCPVault for cross-project vault access |
+| `/webby:kanban <action>` | Manage kanban board — add, move, done, list, reorder |
+| `/webby:kanban-log <task>` | Log activity to a kanban task note |
 
 ## Customization
 

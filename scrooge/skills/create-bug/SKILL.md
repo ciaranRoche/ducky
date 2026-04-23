@@ -166,7 +166,7 @@ Manual steps needed:
 ## Integration
 
 - **story-pointer**: Estimate complexity of the fix
-- **ticket-hygiene**: Validate ticket quality after creation
+- **hygiene**: Validate ticket quality after creation
 - **ticket-triage**: Interactive triage session for deeper assessment
 
 ## Notes

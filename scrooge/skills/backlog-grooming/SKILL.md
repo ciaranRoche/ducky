@@ -1,7 +1,7 @@
 ---
-name: backlog-hygiene
+name: backlog-grooming
 description: Weekly backlog audit — field completeness, staleness tiers, and duplicate
-  detection.
+  detection. Run during grooming to clean up the backlog.
 allowed-tools:
   - mcp__atlassian__jira_search
   - mcp__atlassian__jira_get_issue
@@ -11,22 +11,19 @@ allowed-tools:
   - mcp__atlassian__jira_get_issue_dates
 ---
 
-# Backlog Hygiene: Weekly Backlog Audit
+# Backlog Grooming: Weekly Backlog Audit
 
 Audit the full backlog for field completeness, staleness, and potential duplicates. Read-only — surfaces issues, never modifies tickets. Uses `mcp__atlassian__*` MCP tools exclusively (not jira-cli).
 
-## Story Points Field Mapping
-
-The JIRA instance stores story points in custom fields. When reading issue data from MCP tools, look for these fields (use the first one that has a value):
+## Custom Field Reference
 
 | Field ID | Name | Notes |
 |----------|------|-------|
-| `customfield_10016` | Story point estimate | Next-gen / Jira Software field — check this first |
-| `customfield_10028` | Story Points | Classic field |
+| `customfield_10016` | Story point estimate | Next-gen — check first |
+| `customfield_10028` | Story Points | Classic fallback |
+| `customfield_10464` | Activity Type | Select dropdown |
 
-If neither field has a value, treat the issue as unpointed.
-
-**Important:** These custom fields are NOT returned by default by MCP tools. When calling `mcp__atlassian__jira_search` or `mcp__atlassian__jira_get_issue`, you **must** include them in the `fields` parameter:
+**Important:** Pass the `fields` parameter on every issue query:
 ```
 fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,fixVersions,customfield_10016,customfield_10028,customfield_10464"
 ```
@@ -59,7 +56,7 @@ Score each issue: X/6 fields complete.
 
 ### 3. Staleness Tiers
 
-Classify issues by time since last update:
+Classify issues by time since last meaningful update:
 
 | Tier | Criteria | Action |
 |------|----------|--------|
@@ -87,12 +84,12 @@ Calculate overall metrics:
 - Distribution across staleness tiers
 - Number of potential duplicates
 - Issues with 0 story points (for Stories/Bugs)
-- Fix Version coverage: count of issues with vs without a Fix Version (informational — not all items need one)
+- Fix Version coverage: count of issues with vs without a Fix Version (informational)
 
 ## Output Format
 
 ```
-## Backlog Hygiene Report
+## Backlog Grooming Report
 **[X] open issues in backlog** | Avg completeness: [X]/6
 
 ### Health Summary
@@ -128,10 +125,15 @@ Calculate overall metrics:
 | [PROJ-123] | Story | ... | description, points, AC |
 ```
 
+## Integration
+
+- **hygiene**: Complementary — hygiene validates specific tickets or sprint scope, this audits the full backlog
+- **ticket-triage**: Use to walk through individual items that need grooming
+- **sprint-planning**: Complementary — sprint-planning surfaces planning-relevant items, this gives the full backlog health picture
+
 ## Notes
 
 - Apply the ghostwriter skill for tone
 - Cap "Top Issues to Fix" at 10 — prioritize by staleness + incompleteness
 - Duplicate detection is best-effort. Use cautious language ("possible duplicate", "similar to")
-- This runs weekly (Sunday evening) to prep for Monday grooming
 - Do NOT use jira-cli or Bash for JIRA queries — use the mcp__atlassian__ MCP tools only

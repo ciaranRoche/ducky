@@ -175,7 +175,7 @@ Some JIRA instances use `Initiative` instead of `Feature`. If `Feature` fails, r
 ## Integration
 
 - **create-epic**: Create child epics after feature is set up
-- **ticket-hygiene**: Validate feature quality
+- **hygiene**: Validate feature quality
 
 ## Notes
 

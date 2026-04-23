@@ -150,7 +150,7 @@ Epic Name uses `customfield_10011` in `additional_fields`. Ensure it's passed as
 ## Integration
 
 - **create-story**: Create child stories after epic is set up
-- **ticket-hygiene**: Validate epic quality
+- **hygiene**: Validate epic quality
 
 ## Notes
 

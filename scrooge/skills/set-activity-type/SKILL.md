@@ -113,8 +113,7 @@ Then process each ticket individually, recommending and confirming with the user
 
 ## Integration
 
-- **ticket-hygiene**: Activity Type is one of the 6 required field checks
-- **sprint-hygiene**: Bulk audit flags tickets missing Activity Type
+- **hygiene**: Activity Type is one of the 6 required field checks (both single-ticket and sprint audit)
 - **ticket-triage**: Interactive triage may identify missing Activity Type
 - **create-story / create-bug / create-task**: Set Activity Type at creation time
 

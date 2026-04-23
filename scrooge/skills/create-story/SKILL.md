@@ -163,7 +163,7 @@ Manual steps needed:
 ## Integration
 
 - **story-pointer**: Detailed estimation methodology
-- **ticket-hygiene**: Validate ticket quality after creation
+- **hygiene**: Validate ticket quality after creation
 - **ticket-triage**: Interactive triage session for deeper assessment
 
 ## Notes

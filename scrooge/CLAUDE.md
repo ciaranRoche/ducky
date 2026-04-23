@@ -37,7 +37,7 @@ Fix Version (`fixVersions`) is a standard JIRA field — not a custom field. It 
 - **Querying:** Include `fixVersions` in the `fields` parameter when fetching issues
 - **Setting:** `fields: {"fixVersions": [{"name": "Version Name"}]}`
 - **Validating:** Use `mcp__atlassian__jira_get_project_versions` with `project_key: HYPERFLEET` to get available versions
-- **Release planning:** Use `/scrooge:release-prep` to assess readiness of a specific Fix Version
+- **Release planning:** Use `/scrooge:release-status` to assess readiness of a specific Fix Version
 
 ## Discovering Valid Components
 
@@ -47,28 +47,38 @@ Use `mcp__atlassian__jira_get_project_components` with `project_key: HYPERFLEET`
 
 All skills use `mcp__atlassian__jira_*` MCP tools.
 
-### Read-Only Skills
-| Skill | Purpose |
-|-------|---------|
-| `/scrooge:my-sprint` | Current sprint and your assigned tasks |
-| `/scrooge:my-tasks` | All your assigned tickets |
-| `/scrooge:sprint-status` | Sprint health overview for team leads |
-| `/scrooge:sprint-report` | Sprint health — progress, velocity, blockers, at-risk tickets |
-| `/scrooge:new-tickets` | Tickets created in last 24h — grooming quality assessment |
-| `/scrooge:new-comments` | Tickets with recent comments you may have missed |
-| `/scrooge:backlog-hygiene` | Full backlog audit — field checks, staleness, duplicates |
-| `/scrooge:ticket-hygiene` | Validate required fields on a specific ticket |
-| `/scrooge:sprint-hygiene` | Bulk sprint audit — fields, components, duplicates |
-| `/scrooge:release-prep` | Release readiness — progress, risks, and sprint planning priorities by Fix Version |
+### Triage & Hygiene
+| Skill | Purpose | When to Use |
+|-------|---------|-------------|
+| `/scrooge:ticket-triage <key>` | Interactive triage with validation | Deep-dive a single ticket before sprint |
+| `/scrooge:hygiene <key>\|sprint` | Field completeness and quality checks | Quick validation of one ticket or bulk sprint audit |
 
-### Read+Write Skills
-| Skill | Purpose |
-|-------|---------|
-| `/scrooge:story-pointer` | Estimate story points with historical comparison |
-| `/scrooge:set-activity-type` | Set activity type for capacity planning |
-| `/scrooge:ticket-triage` | Interactive triage — assess and fix ticket readiness |
+### Reports
+| Skill | Purpose | When to Use |
+|-------|---------|-------------|
+| `/scrooge:daily-report` | Sprint progress + new tickets + new comments | Start of day orientation |
+| `/scrooge:sprint-report` | Full sprint health — burn rate, risks, workload | Standups, mid-sprint check-ins |
+| `/scrooge:release-status [version]` | Release readiness by Fix Version | Release planning, status updates |
 
-### Create Skills
+### Planning & Grooming
+| Skill | Purpose | When to Use |
+|-------|---------|-------------|
+| `/scrooge:sprint-planning` | Backlog candidates, stale items, capacity analysis | Before sprint planning meetings |
+| `/scrooge:backlog-grooming` | Full backlog audit — staleness, duplicates, field gaps | Weekly grooming sessions |
+
+### Personal Views
+| Skill | Purpose | When to Use |
+|-------|---------|-------------|
+| `/scrooge:my-sprint` | Your assigned tickets in the active sprint | Quick personal check |
+| `/scrooge:my-tasks` | All your assigned tickets across project | Full workload view |
+
+### Estimation & Fields
+| Skill | Purpose | When to Use |
+|-------|---------|-------------|
+| `/scrooge:story-pointer <key>` | Estimate story points with historical comparison | Pointing tickets during grooming |
+| `/scrooge:set-activity-type <key>` | Set activity type for capacity planning | Fill missing activity types |
+
+### Create
 | Skill | Purpose |
 |-------|---------|
 | `/scrooge:ticket-creator` | Router — delegates to type-specific creator |

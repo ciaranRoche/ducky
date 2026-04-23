@@ -190,7 +190,7 @@ Manual steps needed:
 ## Integration
 
 - **story-pointer**: Estimate task complexity
-- **ticket-hygiene**: Validate ticket quality after creation
+- **hygiene**: Validate ticket quality after creation
 - **ticket-triage**: Interactive triage session for deeper assessment
 
 ## Notes
