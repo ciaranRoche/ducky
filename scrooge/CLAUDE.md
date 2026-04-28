@@ -64,6 +64,7 @@ All skills use `mcp__atlassian__jira_*` MCP tools.
 | Skill | Purpose | When to Use |
 |-------|---------|-------------|
 | `/scrooge:sprint-planning` | Backlog candidates, stale items, capacity analysis | Before sprint planning meetings |
+| `/scrooge:sprint-review` | Validate committed items, flag risks, check capacity | After planning, before sprint starts |
 | `/scrooge:backlog-grooming` | Full backlog audit — staleness, duplicates, field gaps | Weekly grooming sessions |
 
 ### Personal Views

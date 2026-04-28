@@ -66,6 +66,7 @@ claude mcp add obsidian --scope user -- npx @bitbonsai/mcpvault@latest /path/to/
 | `/scrooge:sprint-report` | Sprint health — burn rate, risks, workload, carry-over |
 | `/scrooge:release-status [version]` | Release readiness by Fix Version |
 | `/scrooge:sprint-planning` | Sprint planning prep — candidates, stale items, capacity |
+| `/scrooge:sprint-review` | Pre-sprint readiness — validate plan, flag risks, check capacity |
 | `/scrooge:backlog-grooming` | Backlog audit — staleness, field checks, duplicates |
 | `/scrooge:my-sprint` | Current sprint and your assigned tickets |
 | `/scrooge:my-tasks` | All your assigned JIRA tasks |

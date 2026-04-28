@@ -205,6 +205,7 @@ Based on release pressure, priority, and readiness:
 
 ## Integration
 
+- **sprint-review**: Run after planning to validate the final sprint — readiness, capacity, risks
 - **hygiene**: Use to audit sprint tickets after planning is complete
 - **ticket-triage**: Use to walk through ungroomed items interactively
 - **story-pointer**: Use to estimate unpointed candidates
