@@ -12,14 +12,13 @@ argument-hint: 'add <item> | done <item> | pick'
 
 # Todo: Manage Daily Note Tasks
 
-Add, complete, and pick todos from today's daily note. All operations target the two todo sections in the daily note template.
+Add, complete, and pick todos from today's daily note. All operations target the single todo section in the daily note template.
 
-## Sections
+## Section
 
-The daily note has two todo sections:
+The daily note has one todo section:
 
-- `#### What do I want to do today or tomorrow?` — personal focus items. Runs until `#### Work To Dos`.
-- `#### Work To Dos` — work tasks. Runs until `#### Log`. Managed by the Rollover Daily Todos plugin (rolls unchecked items forward between days). Adding and checking items is safe.
+- `#### To Dos` — all tasks. Runs until `#### Log`. Managed by the Rollover Daily Todos plugin (rolls unchecked items forward between days). Adding and checking items is safe.
 
 ## Subcommands
 
@@ -27,10 +26,8 @@ The daily note has two todo sections:
 
 1. Get today's date via `date +%Y-%m-%d`
 2. Read `Daily/YYYY-MM-DD.md` via `mcp__obsidian__read_note`. If it doesn't exist, create it from the template (see Template section).
-3. Determine the target section:
-   - **Default:** `#### Work To Dos`
-   - **Personal:** If the argument starts with "personal" (e.g., `/todo personal Buy groceries`) or the item is clearly non-work, target `#### What do I want to do today or tomorrow?`
-4. Extract the target section content (from its `####` heading to the next `####` heading)
+3. Target section is always `#### To Dos`
+4. Extract the section content (from `#### To Dos` to `#### Log`)
 5. Append `- [ ] <item>` before the trailing blank `- [ ] ` placeholder if one exists, or after the last existing item
 6. Patch via `mcp__obsidian__patch_note` with the exact old section as `oldString` and the updated section as `newString`
 
@@ -48,7 +45,7 @@ The daily note has two todo sections:
 
 Current section:
 ```
-#### Work To Dos
+#### To Dos
 - [ ] MCP debug server for Hyperfleet
 - [ ] 
 
@@ -56,20 +53,20 @@ Current section:
 ```
 
 Adding "Review PR #55":
-- `oldString`: `#### Work To Dos\n- [ ] MCP debug server for Hyperfleet\n- [ ] \n\n#### Log`
-- `newString`: `#### Work To Dos\n- [ ] MCP debug server for Hyperfleet\n- [ ] Review PR #55\n- [ ] \n\n#### Log`
+- `oldString`: `#### To Dos\n- [ ] MCP debug server for Hyperfleet\n- [ ] \n\n#### Log`
+- `newString`: `#### To Dos\n- [ ] MCP debug server for Hyperfleet\n- [ ] Review PR #55\n- [ ] \n\n#### Log`
 
 #### Output
 
 ```
-Added to Work To Dos:
+Added to To Dos:
 - [ ] Review PR #55
 ```
 
 ### `done <item>` — Mark a todo as complete
 
 1. Read today's daily note
-2. Search both todo sections for unchecked items (`- [ ]`) matching the argument (case-insensitive, partial match is fine)
+2. Search the todo section for unchecked items (`- [ ]`) matching the argument (case-insensitive, partial match is fine)
 3. If exactly one match: replace `- [ ]` with `- [x]` via `mcp__obsidian__patch_note`
 4. If multiple matches: list them numbered and ask the user which one
 5. If no match: tell the user and list the open items so they can try again
@@ -91,22 +88,18 @@ Completed:
 ### `pick` — Pick a task to focus on
 
 1. Read today's daily note
-2. Collect all unchecked `- [ ]` items from both sections (skip blank placeholders)
-3. Present them as a numbered list with section labels:
+2. Collect all unchecked `- [ ]` items from the todo section (skip blank placeholders)
+3. Present them as a numbered list:
 
 ```
 ### Open Tasks
 
-**Personal:**
-1. Buy groceries
-
-**Work:**
-2. Disaster recovery
-3. MCP debug server for Hyperfleet
-4. Awesome Adapters :)
-5. Sync with Christine
-6. Sync with Michael
-7. Talk with Rafael
+1. Disaster recovery
+2. MCP debug server for Hyperfleet
+3. Awesome Adapters :)
+4. Sync with Christine
+5. Sync with Michael
+6. Talk with Rafael
 
 Pick a number to start, or 0 to skip.
 ```
@@ -126,10 +119,7 @@ tags:
 ---
 # DayOfWeek, Month D, YYYY
 
-#### What do I want to do today or tomorrow?
-- [ ] 
-
-#### Work To Dos
+#### To Dos
 - [ ] 
 
 #### Log
@@ -155,4 +145,4 @@ If `patch_note` fails, fall back to `mcp__obsidian__write_note` with `mode: "app
 
 - Apply the ghostwriter skill for tone in any output
 - Keep output concise. Confirm what was done, don't repeat the entire daily note
-- The blank `- [ ] ` placeholder at the end of each section is an Obsidian convention for easy manual entry. Preserve it when adding items (insert before it, not after)
+- The blank `- [ ] ` placeholder at the end of the section is an Obsidian convention for easy manual entry. Preserve it when adding items (insert before it, not after)

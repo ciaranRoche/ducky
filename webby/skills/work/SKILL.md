@@ -21,8 +21,7 @@ Pick an open todo from today's daily note or the kanban board and begin working 
 4. **Collect tasks from both sources:**
 
    **Daily note** — unchecked `- [ ]` items from:
-   - `#### What do I want to do today or tomorrow?` (personal)
-   - `#### Work To Dos` (work)
+   - `#### To Dos`
    - Skip blank placeholders (items where the text after `- [ ] ` is empty or whitespace-only)
 
    **Kanban board** — parse columns by splitting on `## ` headings (content before `%% kanban:settings`):

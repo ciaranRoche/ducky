@@ -21,8 +21,7 @@ Read today's daily note from the Obsidian vault and present a concise summary of
 
 ### Sections to Surface
 
-- `#### What do I want to do today or tomorrow?` — present as **Today's Focus** (only unchecked `- [ ]` items)
-- `#### Work To Dos` — present as **Open Work Items** (only unchecked `- [ ]` items, count them)
+- `#### To Dos` — present as **Open Items** (only unchecked `- [ ]` items, count them)
 - `#### Log` — present as **Session History** (what's already been logged today, if anything)
 - `#### Related Notes` — surface any linked projects, meetings, or learning notes
 
@@ -33,10 +32,7 @@ Present a clean, scannable summary. Do not dump the raw markdown. Example:
 ```
 ### Today (YYYY-MM-DD)
 
-**Focus:**
-- Item from "What do I want to do today or tomorrow?"
-
-**Open Work Items:** (X remaining)
+**Open Items:** (X remaining)
 - [ ] Item 1
 - [ ] Item 2
 

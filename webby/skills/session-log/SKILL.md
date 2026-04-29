@@ -98,10 +98,7 @@ tags:
 ---
 # DayOfWeek, Month D, YYYY
 
-#### What do I want to do today or tomorrow?
-- [ ] 
-
-#### Work To Dos
+#### To Dos
 - [ ] 
 
 #### Log
