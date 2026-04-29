@@ -1,6 +1,6 @@
 {
   "name": "scrooge",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "JIRA project management — ticket creation, triage, hygiene checks, sprint tracking, estimation, and release planning in your writing style",
   "author": {
     "name": "Ciaran Roche",

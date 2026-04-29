@@ -143,7 +143,10 @@ project = HYPERFLEET AND status != Done AND summary ~ "keyword"
 
 - Use `mcp__atlassian__jira_get_agile_boards` to find the board for project HYPERFLEET
 - Use `mcp__atlassian__jira_get_sprints_from_board` to find the active sprint
-- Use `mcp__atlassian__jira_get_sprint_issues` to pull all sprint issues (pass `fields` parameter)
+- Use `mcp__atlassian__jira_get_sprint_issues` to pull all sprint issues. **You must pass the `fields` parameter:**
+  ```
+  fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,fixVersions,customfield_10016,customfield_10028,customfield_10464"
+  ```
 
 ### Step 2: Check for Duplicates (CRITICAL)
 

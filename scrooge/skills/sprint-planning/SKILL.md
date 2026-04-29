@@ -39,7 +39,11 @@ fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,
 Establish where things stand before planning the next sprint.
 
 - Use `mcp__atlassian__jira_get_agile_boards` → `mcp__atlassian__jira_get_sprints_from_board` to find the active sprint
-- Use `mcp__atlassian__jira_get_sprint_issues` to pull all sprint issues (pass `fields` parameter)
+- Use `mcp__atlassian__jira_get_sprint_issues` to pull all sprint issues. **You must pass the `fields` parameter:**
+  ```
+  fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,fixVersions,customfield_10016,customfield_10028,customfield_10464"
+  ```
+- For each issue, read story points from `customfield_10016` first, then fall back to `customfield_10028`.
 - Calculate: issues by status, story points per status, progress %
 - Identify carry-over candidates: items still in To Do or In Progress that may spill
 
@@ -50,7 +54,7 @@ This gives the baseline: how much is likely to carry over and how much capacity 
 Look at the most recent closed sprint(s) to establish a velocity baseline.
 
 - Use `mcp__atlassian__jira_get_sprints_from_board` — find the last 1-2 closed sprints (state = "closed")
-- For each, use `mcp__atlassian__jira_get_sprint_issues` to count completed story points
+- For each, use `mcp__atlassian__jira_get_sprint_issues` (pass `fields` parameter with `customfield_10016,customfield_10028`) to count completed story points
 - Calculate average velocity (points completed per sprint)
 
 This sets the capacity ceiling for the next sprint.
@@ -71,9 +75,10 @@ Surface items tagged with a Fix Version that need sprint assignment.
 
 Surface groomed backlog items that are ready to pull into a sprint.
 
-Search using `mcp__atlassian__jira_search`:
+Search using `mcp__atlassian__jira_search` with the `fields` parameter:
 ```
-project = HYPERFLEET AND status != Done AND status != Closed AND (sprint not in openSprints() OR sprint is EMPTY) ORDER BY priority ASC, updated DESC
+jql: "project = HYPERFLEET AND status != Done AND status != Closed AND (sprint not in openSprints() OR sprint is EMPTY) ORDER BY priority ASC, updated DESC"
+fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,fixVersions,customfield_10016,customfield_10028,customfield_10464"
 ```
 
 For each item, score readiness on 6 points (story points, description, AC, component, activity type, assignee). Filter to items scoring 4+ — these are ready or nearly ready.

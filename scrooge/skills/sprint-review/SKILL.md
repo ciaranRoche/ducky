@@ -38,7 +38,11 @@ fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,
 ### 1. Get Sprint Contents
 
 - Use `mcp__atlassian__jira_get_agile_boards` → `mcp__atlassian__jira_get_sprints_from_board` to find the active sprint (or next sprint if one exists)
-- Use `mcp__atlassian__jira_get_sprint_issues` to pull all committed issues (pass `fields` parameter)
+- Use `mcp__atlassian__jira_get_sprint_issues` to pull all committed issues. **You must pass the `fields` parameter:**
+  ```
+  fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,fixVersions,customfield_10016,customfield_10028,customfield_10464"
+  ```
+- For each issue, read story points from `customfield_10016` first, then fall back to `customfield_10028`.
 - Note sprint name, start date, end date, and goal (if set)
 
 ### 2. Readiness Audit
@@ -78,7 +82,7 @@ Surface risks to monitor during sprint execution:
 Estimate whether the sprint is over- or under-committed:
 
 - **Total committed**: Sum all story points in the sprint
-- **Historical velocity**: Check the last 2 closed sprints via `mcp__atlassian__jira_get_sprints_from_board` (state = "closed") and `mcp__atlassian__jira_get_sprint_issues` for each. Calculate average points completed.
+- **Historical velocity**: Check the last 2 closed sprints via `mcp__atlassian__jira_get_sprints_from_board` (state = "closed") and `mcp__atlassian__jira_get_sprint_issues` for each (pass `fields` parameter with `customfield_10016,customfield_10028`). Calculate average points completed.
 - **Comparison**: committed vs velocity. Flag if committed exceeds velocity by more than 20% (overcommitted) or is below 70% (undercommitted).
 
 ### 5. Activity Type Balance

@@ -66,7 +66,10 @@ Pass the `fields` parameter. Paginate if needed.
 
 - Use `mcp__atlassian__jira_get_agile_boards` to find the board for project HYPERFLEET
 - Use `mcp__atlassian__jira_get_sprints_from_board` to find the active sprint
-- Use `mcp__atlassian__jira_get_sprint_issues` to get active sprint issue keys (pass `fields` parameter)
+- Use `mcp__atlassian__jira_get_sprint_issues` to get active sprint issue keys. **You must pass the `fields` parameter:**
+  ```
+  fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,fixVersions,customfield_10016,customfield_10028,customfield_10464"
+  ```
 - Cross-reference: for each release issue, note whether it is currently in the active sprint
 
 ### 4. Classify Issues

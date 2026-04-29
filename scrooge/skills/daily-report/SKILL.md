@@ -33,7 +33,11 @@ fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,
 ### 1. Sprint Progress Snapshot
 
 - Use `mcp__atlassian__jira_get_agile_boards` → `mcp__atlassian__jira_get_sprints_from_board` to find the active sprint
-- Use `mcp__atlassian__jira_get_sprint_issues` to pull all sprint issues (pass `fields` parameter)
+- Use `mcp__atlassian__jira_get_sprint_issues` to pull all sprint issues. **You must pass the `fields` parameter:**
+  ```
+  fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,fixVersions,sprint,customfield_10016,customfield_10028,customfield_10464"
+  ```
+- For each issue, read story points from `customfield_10016` first, then fall back to `customfield_10028`. If neither has a value, treat as 0 points and count as unpointed.
 - Calculate: issues by status (To Do / In Progress / Done), story points per status, progress %
 - Flag: blockers (Highest/High priority not Done), unassigned tickets, stale in-progress (3+ days no update based on `updated` field)
 
@@ -48,7 +52,12 @@ project = HYPERFLEET AND created >= -24h ORDER BY created DESC
 
 If no tickets found, note it and move on.
 
-For each new ticket, use `mcp__atlassian__jira_get_issue` to read full details (pass `fields` parameter). Assess grooming quality:
+For each new ticket, use `mcp__atlassian__jira_get_issue` to read full details. **You must pass the `fields` parameter:**
+```
+fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,fixVersions,sprint,customfield_10016,customfield_10028,customfield_10464"
+```
+
+Assess grooming quality:
 
 **By type:**
 - **Bugs:** Steps to reproduce present, expected vs actual behavior, environment noted
