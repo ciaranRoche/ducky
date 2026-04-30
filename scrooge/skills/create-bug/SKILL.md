@@ -83,11 +83,12 @@ Use `mcp__atlassian__jira_create_issue` with:
 - `issue_type`: `Bug`
 - `description`: The bug description in Markdown (see template below)
 - `components`: component name (if applicable)
-- `additional_fields`: JSON string with custom fields:
+- `additional_fields`: JSON string with custom fields (set **both** story point fields to ensure one sticks):
   ```json
   {
     "priority": {"name": "Major"},
     "customfield_10016": 5,
+    "customfield_10028": 5,
     "customfield_10464": {"value": "Quality / Stability / Reliability"}
   }
   ```
@@ -140,7 +141,12 @@ Valid activity types: `Associate Wellness & Development`, `Incidents & Support`,
 
 ### Step 4: Post-Creation
 
-Use `mcp__atlassian__jira_get_issue` to verify the ticket was created with all fields.
+Use `mcp__atlassian__jira_get_issue` with `fields: "summary,status,priority,components,fixVersions,customfield_10016,customfield_10028,customfield_10464"` to verify the ticket was created with all fields.
+
+**Verify story points stuck.** Check that either `customfield_10016` or `customfield_10028` has the intended value. If both are null/missing, retry with `mcp__atlassian__jira_update_issue`:
+```
+fields: '{"customfield_10016": <points>, "customfield_10028": <points>}'
+```
 
 If the bug belongs to an epic, use `mcp__atlassian__jira_link_to_epic` to link it:
 - `issue_key`: the new ticket key

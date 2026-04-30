@@ -25,7 +25,7 @@ skills/          Slash commands and reusable capabilities (SKILL.md files)
 | Field ID | Name | Type | Usage |
 |----------|------|------|-------|
 | `customfield_10016` | Story point estimate | Number | Primary story points field (next-gen) — check this first |
-| `customfield_10028` | Story Points | Number | Classic field — fallback if 10016 is empty |
+| `customfield_10028` | Story Points | Number | Classic field — fallback if 10016 is empty. **When creating or updating, set both fields** to ensure the value sticks (the API silently ignores whichever field is inactive for the issue type) |
 | `customfield_10464` | Activity Type | Select | Set as `{"value": "Type Name"}` in `additional_fields` |
 | `customfield_10011` | Epic Name | String | Required when creating epics |
 | `customfield_10014` | Epic Link | Any | Links issues to parent epics |

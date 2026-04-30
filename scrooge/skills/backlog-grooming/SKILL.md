@@ -84,7 +84,7 @@ Calculate overall metrics:
 - Distribution across staleness tiers
 - Number of potential duplicates
 - Issues with 0 story points (for Stories/Bugs)
-- Fix Version coverage: count of issues with vs without a Fix Version (informational)
+- Fix Version coverage: for each issue, check the `fixVersions` array in the response — an issue has a Fix Version when this array contains at least one entry. Count issues with a non-empty `fixVersions` array vs those with an empty or missing array. Report this as informational only
 
 ## Output Format
 
