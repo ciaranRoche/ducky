@@ -33,9 +33,7 @@ Install only what you need. Each plugin is self-contained.
 
 ### Plugin-specific setup
 
-**scrooge** requires [mcp-atlassian](https://github.com/sooperset/mcp-atlassian) and two environment variables:
-- `JIRA_USERNAME` — Atlassian email
-- `JIRA_API_TOKEN` — Atlassian API token
+**scrooge** requires Atlassian Rovo MCP (OAuth authentication will be prompted on first use).
 
 **darkwing** requires [gh](https://cli.github.com/) (GitHub CLI).
 
