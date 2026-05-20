@@ -21,7 +21,7 @@ Install only what you need. Each plugin is self-contained.
 
 1. Add the marketplace:
    ```bash
-   claude plugin marketplace add github:ciaranRoche/ducky
+   claude plugin marketplace add https://github.com/ciaranRoche/ducky.git
    ```
 2. Install the plugins you want:
    ```bash
