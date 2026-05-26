@@ -26,13 +26,12 @@ Assess the readiness of a release by Fix Version. Shows what's done, what's rema
 
 | Field ID | Name | Notes |
 |----------|------|-------|
-| `customfield_10016` | Story point estimate | Next-gen — check first |
-| `customfield_10028` | Story Points | Classic fallback |
+| `customfield_10028` | Story Points | The story points field for this instance |
 | `customfield_10464` | Activity Type | Select dropdown |
 
 **Important:** Pass the `fields` parameter on every issue query:
 ```
-fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,fixVersions,customfield_10016,customfield_10028,customfield_10464"
+fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,fixVersions,customfield_10028,customfield_10464"
 ```
 
 ## Behavior
@@ -68,7 +67,7 @@ Pass the `fields` parameter. Paginate if needed.
 - Use `mcp__atlassian__jira_get_sprints_from_board` to find the active sprint
 - Use `mcp__atlassian__jira_get_sprint_issues` to get active sprint issue keys. **You must pass the `fields` parameter:**
   ```
-  fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,fixVersions,customfield_10016,customfield_10028,customfield_10464"
+  fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,fixVersions,customfield_10028,customfield_10464"
   ```
 - Cross-reference: for each release issue, note whether it is currently in the active sprint
 
@@ -87,7 +86,7 @@ For each non-Done issue, evaluate readiness on a 6-point scale:
 
 | Criterion | Check |
 |-----------|-------|
-| **Story Points** | `customfield_10016` or `customfield_10028` has a value |
+| **Story Points** | `customfield_10028` has a value |
 | **Description** | Description exists and has > 100 characters |
 | **Acceptance Criteria** | Description contains "acceptance criteria", "AC:", "given/when/then", or checklist pattern (- [ ]) |
 | **Component** | Components array is non-empty and valid (validate against `mcp__atlassian__jira_get_project_components`) |

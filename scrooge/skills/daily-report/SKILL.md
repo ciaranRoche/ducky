@@ -19,13 +19,12 @@ One-shot daily briefing combining sprint progress, new ticket quality, and recen
 
 | Field ID | Name | Notes |
 |----------|------|-------|
-| `customfield_10016` | Story point estimate | Next-gen — check first |
-| `customfield_10028` | Story Points | Classic fallback |
+| `customfield_10028` | Story Points | The story points field for this instance |
 | `customfield_10464` | Activity Type | Select dropdown |
 
 **Important:** Pass the `fields` parameter on every issue query:
 ```
-fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,fixVersions,sprint,customfield_10016,customfield_10028,customfield_10464"
+fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,fixVersions,sprint,customfield_10028,customfield_10464"
 ```
 
 ## Behavior
@@ -35,9 +34,9 @@ fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,
 - Use `mcp__atlassian__jira_get_agile_boards` → `mcp__atlassian__jira_get_sprints_from_board` to find the active sprint
 - Use `mcp__atlassian__jira_get_sprint_issues` to pull all sprint issues. **You must pass the `fields` parameter:**
   ```
-  fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,fixVersions,sprint,customfield_10016,customfield_10028,customfield_10464"
+  fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,fixVersions,sprint,customfield_10028,customfield_10464"
   ```
-- For each issue, read story points from `customfield_10016` first, then fall back to `customfield_10028`. If neither has a value, treat as 0 points and count as unpointed.
+- For each issue, read story points from `customfield_10028`. If unset, treat as 0 points and count as unpointed.
 - Calculate: issues by status (To Do / In Progress / Done), story points per status, progress %
 - Flag: blockers (Highest/High priority not Done), unassigned tickets, stale in-progress (3+ days no update based on `updated` field)
 
@@ -54,7 +53,7 @@ If no tickets found, note it and move on.
 
 For each new ticket, use `mcp__atlassian__jira_get_issue` to read full details. **You must pass the `fields` parameter:**
 ```
-fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,fixVersions,sprint,customfield_10016,customfield_10028,customfield_10464"
+fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,fixVersions,sprint,customfield_10028,customfield_10464"
 ```
 
 Assess grooming quality:

@@ -19,13 +19,12 @@ Audit the full backlog for field completeness, staleness, and potential duplicat
 
 | Field ID | Name | Notes |
 |----------|------|-------|
-| `customfield_10016` | Story point estimate | Next-gen — check first |
-| `customfield_10028` | Story Points | Classic fallback |
+| `customfield_10028` | Story Points | The story points field for this instance |
 | `customfield_10464` | Activity Type | Select dropdown |
 
 **Important:** Pass the `fields` parameter on every issue query:
 ```
-fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,fixVersions,customfield_10016,customfield_10028,customfield_10464"
+fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,fixVersions,customfield_10028,customfield_10464"
 ```
 
 ## Behavior

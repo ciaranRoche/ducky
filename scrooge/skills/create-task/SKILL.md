@@ -20,7 +20,7 @@ Uses `mcp__atlassian__*` MCP tools exclusively (not jira-cli).
 
 | Field ID | Name | Format |
 |----------|------|--------|
-| `customfield_10016` | Story point estimate | Number (0, 1, 3, 5, 8, 13) |
+| `customfield_10028` | Story Points | Number (0, 1, 3, 5, 8, 13) |
 | `customfield_10464` | Activity Type | `{"value": "Type Name"}` |
 
 ## Writing Style
@@ -85,11 +85,10 @@ Use `mcp__atlassian__jira_create_issue` with:
 - `issue_type`: `Task`
 - `description`: The task description in Markdown (see templates below)
 - `components`: component name (if applicable)
-- `additional_fields`: JSON string with custom fields (set **both** story point fields to ensure one sticks):
+- `additional_fields`: JSON string with custom fields:
   ```json
   {
     "priority": {"name": "Normal"},
-    "customfield_10016": 3,
     "customfield_10028": 3,
     "customfield_10464": {"value": "Future Sustainability"}
   }
@@ -166,11 +165,11 @@ Valid activity types: `Associate Wellness & Development`, `Incidents & Support`,
 
 ### Step 4: Post-Creation
 
-Use `mcp__atlassian__jira_get_issue` with `fields: "summary,status,priority,components,fixVersions,customfield_10016,customfield_10028,customfield_10464"` to verify the ticket was created with all fields.
+Use `mcp__atlassian__jira_get_issue` with `fields: "summary,status,priority,components,fixVersions,customfield_10028,customfield_10464"` to verify the ticket was created with all fields.
 
-**Verify story points stuck.** Check that either `customfield_10016` or `customfield_10028` has the intended value. If both are null/missing, retry with `mcp__atlassian__jira_update_issue`:
+**Verify story points stuck.** Check that `customfield_10028` has the intended value. If null/missing, retry with `mcp__atlassian__jira_update_issue`:
 ```
-fields: '{"customfield_10016": <points>, "customfield_10028": <points>}'
+fields: '{"customfield_10028": <points>}'
 ```
 
 If the task belongs to an epic, use `mcp__atlassian__jira_link_to_epic` to link it:

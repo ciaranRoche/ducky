@@ -12,20 +12,13 @@ allowed-tools:
 
 Show the current sprint information and the user's assigned tickets. Uses `mcp__atlassian__*` MCP tools exclusively (not jira-cli).
 
-## Story Points Field Mapping
+## Story Points Field
 
-The JIRA instance stores story points in custom fields. When reading issue data from MCP tools, look for these fields (use the first one that has a value):
+Story points live in `customfield_10028` on this JIRA instance. If the field has no value, treat the issue as 0 story points.
 
-| Field ID | Name | Notes |
-|----------|------|-------|
-| `customfield_10016` | Story point estimate | Next-gen / Jira Software field — check this first |
-| `customfield_10028` | Story Points | Classic field |
-
-If neither field has a value, treat the issue as having 0 story points.
-
-**Important:** These custom fields are NOT returned by default by MCP tools. When calling `mcp__atlassian__jira_search` or `mcp__atlassian__jira_get_sprint_issues`, you **must** include them in the `fields` parameter:
+**Important:** This field is NOT returned by default by MCP tools. When calling `mcp__atlassian__jira_search` or `mcp__atlassian__jira_get_sprint_issues`, you **must** include it in the `fields` parameter:
 ```
-fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,customfield_10016,customfield_10028"
+fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,customfield_10028"
 ```
 
 ## Behavior

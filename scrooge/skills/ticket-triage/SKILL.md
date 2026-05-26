@@ -31,13 +31,12 @@ This is not a field checklist -- that's `/hygiene`. This is a conversation about
 
 | Field ID | Name | Notes |
 |----------|------|-------|
-| `customfield_10016` | Story point estimate | Next-gen — check first |
-| `customfield_10028` | Story Points | Classic fallback |
+| `customfield_10028` | Story Points | The story points field for this instance |
 | `customfield_10464` | Activity Type | Select dropdown |
 
 **Important:** These custom fields are NOT returned by default by MCP tools. When calling `mcp__atlassian__jira_get_issue` or `mcp__atlassian__jira_search`, you **must** include them in the `fields` parameter:
 ```
-fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,fixVersions,customfield_10016,customfield_10028,customfield_10464"
+fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,fixVersions,customfield_10028,customfield_10464"
 ```
 
 ## When to Use This Skill
@@ -83,7 +82,7 @@ Run the 6 required field checks inline (from the data already fetched):
 1. Title: clear, actionable, under 100 characters
 2. Description: detailed (> 100 characters)
 3. Acceptance criteria: at least 2 testable criteria
-4. Story points: set (scale: 0, 1, 3, 5, 8, 13) — check `customfield_10016` then `customfield_10028`
+4. Story points: set (scale: 0, 1, 3, 5, 8, 13) — check `customfield_10028`
 5. Component: set and valid — validate against `mcp__atlassian__jira_get_project_components`
 6. Activity type: set for capacity planning — check `customfield_10464`
 
@@ -249,7 +248,7 @@ Throughout the assessment, when issues are found:
 4. Make the change using `mcp__atlassian__jira_update_issue`
 
 Common fixes:
-- **Set story points**: `fields: {"customfield_10016": X}`
+- **Set story points**: `fields: {"customfield_10028": X}`
 - **Set activity type**: `fields: {"customfield_10464": {"value": "Type Value"}}`
 - **Update description**: `fields: {"description": "Updated description in Markdown"}`
 - **Set component**: use the `components` parameter

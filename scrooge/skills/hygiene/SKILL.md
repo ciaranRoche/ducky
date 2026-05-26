@@ -28,13 +28,12 @@ Validate JIRA tickets for field completeness, quality standards, and potential d
 
 | Field ID | Name | Notes |
 |----------|------|-------|
-| `customfield_10016` | Story point estimate | Next-gen — check first |
-| `customfield_10028` | Story Points | Classic fallback |
+| `customfield_10028` | Story Points | The story points field for this instance |
 | `customfield_10464` | Activity Type | Select dropdown |
 
 **Important:** These custom fields are NOT returned by default by MCP tools. You **must** include them in the `fields` parameter:
 ```
-fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,fixVersions,customfield_10016,customfield_10028,customfield_10464"
+fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,fixVersions,customfield_10028,customfield_10464"
 ```
 
 ## Required Field Checks (6-point score)
@@ -46,7 +45,7 @@ These checks apply in both single-ticket and sprint modes:
 | 1 | Title | Clear, actionable, under 100 characters |
 | 2 | Description | Detailed context (> 100 characters) |
 | 3 | Acceptance Criteria | At least 2 clear, testable criteria |
-| 4 | Story Points | Set (scale: 0, 1, 3, 5, 8, 13) — check `customfield_10016` then `customfield_10028` |
+| 4 | Story Points | Set (scale: 0, 1, 3, 5, 8, 13) — check `customfield_10028` |
 | 5 | Component | Set to a valid project component |
 | 6 | Activity Type | Set for capacity planning — check `customfield_10464` |
 
@@ -145,7 +144,7 @@ project = HYPERFLEET AND status != Done AND summary ~ "keyword"
 - Use `mcp__atlassian__jira_get_sprints_from_board` to find the active sprint
 - Use `mcp__atlassian__jira_get_sprint_issues` to pull all sprint issues. **You must pass the `fields` parameter:**
   ```
-  fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,fixVersions,customfield_10016,customfield_10028,customfield_10464"
+  fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,fixVersions,customfield_10028,customfield_10464"
   ```
 
 ### Step 2: Check for Duplicates (CRITICAL)

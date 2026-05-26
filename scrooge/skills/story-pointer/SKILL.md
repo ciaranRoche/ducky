@@ -14,20 +14,13 @@ allowed-tools:
 
 Uses `mcp__atlassian__*` MCP tools exclusively (not jira-cli).
 
-## Story Points Field Mapping
+## Story Points Field
 
-The JIRA instance stores story points in custom fields. When reading or writing story points, use these fields:
+Story points live in `customfield_10028` on this JIRA instance. Read and write that field.
 
-| Field ID | Name | Notes |
-|----------|------|-------|
-| `customfield_10016` | Story point estimate | Next-gen / Jira Software field — check this first |
-| `customfield_10028` | Story Points | Classic field |
-
-When reading, use the first field that has a value. When writing, set `customfield_10016`.
-
-**Important:** These custom fields are NOT returned by default by MCP tools. When calling `mcp__atlassian__jira_get_issue` or `mcp__atlassian__jira_search`, you **must** include them in the `fields` parameter:
+**Important:** This field is NOT returned by default by MCP tools. When calling `mcp__atlassian__jira_get_issue` or `mcp__atlassian__jira_search`, you **must** include it in the `fields` parameter:
 ```
-fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,customfield_10016,customfield_10028"
+fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,customfield_10028"
 ```
 
 ## When to Use This Skill
@@ -144,7 +137,7 @@ project = HYPERFLEET AND status = Done AND type = Story AND "Story Points" is no
 
 Once agreed, set story points using `mcp__atlassian__jira_update_issue`:
 - `issue_key`: the ticket key
-- `fields`: `{"customfield_10016": X}` where X is 0, 1, 3, 5, 8, or 13
+- `fields`: `{"customfield_10028": X}` where X is 0, 1, 3, 5, 8, or 13
 
 ## Team Calibration Notes
 

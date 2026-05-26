@@ -24,13 +24,12 @@ Run this after sprint planning, before the sprint kicks off.
 
 | Field ID | Name | Notes |
 |----------|------|-------|
-| `customfield_10016` | Story point estimate | Next-gen — check first |
-| `customfield_10028` | Story Points | Classic fallback |
+| `customfield_10028` | Story Points | The story points field for this instance |
 | `customfield_10464` | Activity Type | Select dropdown |
 
 **Important:** Pass the `fields` parameter on every issue query:
 ```
-fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,fixVersions,customfield_10016,customfield_10028,customfield_10464"
+fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,fixVersions,customfield_10028,customfield_10464"
 ```
 
 ## Behavior
@@ -40,9 +39,9 @@ fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,
 - Use `mcp__atlassian__jira_get_agile_boards` → `mcp__atlassian__jira_get_sprints_from_board` to find the active sprint (or next sprint if one exists)
 - Use `mcp__atlassian__jira_get_sprint_issues` to pull all committed issues. **You must pass the `fields` parameter:**
   ```
-  fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,fixVersions,customfield_10016,customfield_10028,customfield_10464"
+  fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,fixVersions,customfield_10028,customfield_10464"
   ```
-- For each issue, read story points from `customfield_10016` first, then fall back to `customfield_10028`.
+- For each issue, read story points from `customfield_10028`.
 - Note sprint name, start date, end date, and goal (if set)
 
 ### 2. Readiness Audit
@@ -51,7 +50,7 @@ For each sprint item, score readiness on a 6-point scale:
 
 | # | Check | Requirement |
 |---|-------|-------------|
-| 1 | Story Points | `customfield_10016` or `customfield_10028` has a value |
+| 1 | Story Points | `customfield_10028` has a value |
 | 2 | Description | Exists and has > 100 characters |
 | 3 | Acceptance Criteria | Contains testable criteria (AC:, given/when/then, checklist) |
 | 4 | Component | Set and valid (validate against `mcp__atlassian__jira_get_project_components`) |
@@ -82,7 +81,7 @@ Surface risks to monitor during sprint execution:
 Estimate whether the sprint is over- or under-committed:
 
 - **Total committed**: Sum all story points in the sprint
-- **Historical velocity**: Check the last 2 closed sprints via `mcp__atlassian__jira_get_sprints_from_board` (state = "closed") and `mcp__atlassian__jira_get_sprint_issues` for each (pass `fields` parameter with `customfield_10016,customfield_10028`). Calculate average points completed.
+- **Historical velocity**: Check the last 2 closed sprints via `mcp__atlassian__jira_get_sprints_from_board` (state = "closed") and `mcp__atlassian__jira_get_sprint_issues` for each (pass `fields` parameter with `customfield_10028`). Calculate average points completed.
 - **Comparison**: committed vs velocity. Flag if committed exceeds velocity by more than 20% (overcommitted) or is below 70% (undercommitted).
 
 ### 5. Activity Type Balance

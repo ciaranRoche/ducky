@@ -25,14 +25,13 @@ Comprehensive sprint health report. Read-only — surfaces issues, never modifie
 
 | Field ID | Name | Notes |
 |----------|------|-------|
-| `customfield_10016` | Story point estimate | Next-gen — check first |
-| `customfield_10028` | Story Points | Classic fallback |
+| `customfield_10028` | Story Points | The story points field for this instance |
 
-If neither field has a value, treat the issue as having 0 story points and note it in the report.
+If the field has no value, treat the issue as 0 story points and note it in the report.
 
 **Important:** Pass the `fields` parameter on every issue query:
 ```
-fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,customfield_10016,customfield_10028"
+fields: "summary,description,issuetype,status,priority,labels,assignee,reporter,created,updated,components,customfield_10028"
 ```
 
 ## Behavior

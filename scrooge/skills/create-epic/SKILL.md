@@ -72,7 +72,7 @@ Use `mcp__atlassian__jira_create_issue` with:
 
 Notes:
 - `customfield_10011` (Epic Name) is **required** for epics
-- No `customfield_10016` -- epics aggregate child story points
+- No `customfield_10028` -- epics aggregate child story points
 - No `customfield_10464` -- activity type is set on child stories
 
 ### Description Template
