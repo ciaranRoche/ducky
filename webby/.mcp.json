@@ -2,7 +2,7 @@
   "mcpServers": {
     "obsidian": {
       "command": "npx",
-      "args": ["@bitbonsai/mcpvault@latest", "/home/croche/Vault/Notes"]
+      "args": ["@bitbonsai/mcpvault@latest", "/home/croche/Obsidian/Notes"]
     }
   }
 }
