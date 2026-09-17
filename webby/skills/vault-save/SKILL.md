@@ -1,68 +1,65 @@
 ---
 name: vault-save
 description: File new knowledge into the Obsidian vault at the correct location with
-  proper frontmatter and wiki-links.
+  proper frontmatter and wiki-links, and link it from today's daily note.
 allowed-tools:
   - mcp__obsidian__write_note
   - mcp__obsidian__search_notes
   - mcp__obsidian__read_note
+  - mcp__obsidian__get_note_outline
   - mcp__obsidian__patch_note
   - mcp__obsidian__update_frontmatter
+  - mcp__obsidian__list_directory
+  - Bash
 argument-hint: '<topic or content>'
 ---
 
 # Vault Save: File New Knowledge
 
-Create a new note in the Obsidian vault at the correct location, with proper frontmatter, wiki-links to related notes, and content written in the user's voice.
+Create a new note in the Obsidian vault at the correct location, with frontmatter, wiki-links to related notes, content in the user's voice, and a link back from today's daily note.
 
 ## Behavior
 
-1. **Determine what to save** from the argument or conversation context. Ask the user to clarify if unclear.
-2. **Choose the correct vault location** based on content type:
+1. **Read `_AGENT_MANIFEST.md`** at the vault root with `mcp__obsidian__read_note`. It is the source of truth for folders, file naming, frontmatter, and wiki-link format. If anything below conflicts with it, the manifest wins.
+2. **Determine what to save** from the argument or conversation context. Ask if unclear.
+3. **Choose the location** by content type:
 
-   | Content Type | Location | Template Reference |
-   |---|---|---|
-   | Work technical learning | `Work/Knowledge/` | Knowledge-Template |
-   | Personal technical learning | `Personal/Knowledge/` | Knowledge-Template |
-   | Work project documentation | `Work/Projects/[Project]/` | Work-Project-Template |
-   | Personal project documentation | `Personal/Projects/` | Project-Template |
-   | Meeting notes | `Work/Meetings/` | Meeting-Template |
-   | Technical design/decision | `Work/Projects/[Project]/` | Technical-Doc-Template |
-   | Homelab/infrastructure | `Personal/Projects/` | Project-Template |
+   | Content Type | Location | Template | Daily bullet |
+   |---|---|---|---|
+   | Work technical learning | `20_Work/knowledge/` | Knowledge-Template | Learning |
+   | Personal technical learning | `30_Personal/knowledge/` | Knowledge-Template | Learning |
+   | Work project documentation | `20_Work/<project>/` | Work-Project-Template | Projects |
+   | Technical design/decision | `20_Work/<project>/` | Technical-Doc-Template | Projects |
+   | Personal project documentation | `30_Personal/projects/` | Project-Template | Projects |
+   | Homelab/infrastructure | `30_Personal/projects/` | Project-Template | Projects |
+   | Meeting notes | `20_Work/meetings/` | Meeting-Template | Meetings |
+   | Project unknown / unsorted | `00_Inbox/` | closest match | Learning |
 
-   If the location is ambiguous, ask the user.
+   Templates live in `80_System/Templates/`. `20_Work/<project>/` is flat and lowercase (e.g. `20_Work/hyperfleet/`): list `20_Work/` with `mcp__obsidian__list_directory` to pick the project folder, and never create subfolders inside it. Never write to the legacy `Work/`, `Personal/`, `Resources/`, or `Attachments/` folders. If the location is ambiguous, ask.
 
-3. **Search for related notes** using `mcp__obsidian__search_notes` with relevant terms. Identify 2-5 related notes to link to.
-4. **Create the note** using `mcp__obsidian__write_note`:
-   - Use descriptive file names with spaces (Obsidian-friendly)
-   - Include frontmatter with at minimum: `date`, `type`, `tags`
-   - Add wiki-links to related notes in the body
-   - Apply the ghostwriter skill for writing tone
-   - Structure content with clear headings
-5. **Report what was created**:
-   - File path
-   - Why that location was chosen
-   - Tags applied
-   - Related notes linked
-   - Suggest hub notes to link from if appropriate (`[[Work Projects Hub]]`, `[[Home Lab Hub]]`, etc.)
-
-6. **Optionally update today's daily note** `#### Related Notes` section to reference the new note. Only do this if the user is actively working in a daily note context (e.g., they ran `/daily` earlier in the session). Use `mcp__obsidian__patch_note` to add the wiki-link.
+4. **Check for an existing note** on the topic with `mcp__obsidian__search_notes`. If one exists, offer to update it instead of duplicating.
+5. **Find 2-5 related notes** to link to (same search).
+6. **Create the note** with `mcp__obsidian__write_note`:
+   - File name per the manifest: `[ID]-[project]-[slug].md`, where `ID` is `date +%Y%m%d%H%M%S` taken at creation (e.g. `20260917143000-hyperfleet-pod-security-standards.md`)
+   - Frontmatter per the manifest schema (see below). Use the template's headings for the body structure.
+   - Wiki-links to related notes in the body, in the manifest format `[[full-filename|Title]]`
+   - Ghostwriter skill for tone
+7. **Link it from today's daily note.** This is required, not optional:
+   - `date +%Y-%m-%d`, read `10_Daily/YYYY-MM-DD.md`. If it does not exist, skip this step and tell the user (do not create the daily note from here).
+   - Confirm `#### Related Notes` exists via `mcp__obsidian__get_note_outline`; if missing, tell the user and skip.
+   - Patch the matching bullet (`- Projects: `, `- Meetings: `, `- Learning: `) to append `[[full-filename|Title]]`, comma-separated if links already exist.
+   - Example: `oldString` `- Learning: ` -> `newString` `- Learning: [[20260917143000-hyperfleet-pod-security-standards|Pod Security Standards]]`
+8. **Report**: path, why that location, tags, related notes linked, and which hub note (`[[Work Projects Hub]]`, `[[Home Lab Hub]]`, `[[Technology Hub]]`) should get a link if it is a project or knowledge note. Hubs are hand-maintained, offer to patch the hub, do not do it unasked.
 
 ## Frontmatter Conventions
 
-```yaml
----
-date: YYYY-MM-DD
-type: knowledge | project | meeting | technical-doc
-tags:
-  - relevant-tag
----
-```
+Follow the schema in `_AGENT_MANIFEST.md` exactly: the keys `id`, `type`, `status`, `project`, `tags`, `aliases`, in that order. `id` is quoted and equals the filename ID. `tags` and `aliases` are always arrays, and the first alias is the human title. Do not copy the schema from here; re-read the manifest so changes to it are picked up.
+
+Extra keys go after the required ones, e.g. `jira:` (a list of ticket keys, used instead of ticket keys as tags).
+
+Tag rules: lowercase, hyphenated, singular (`adapter` not `adapters`), reuse an existing tag over inventing a synonym (`multitenancy` not `multi-tenancy`, `postgres` not `postgresql`). Ticket keys and PR numbers go in `jira:` or the body, never as tags.
 
 ## Notes
 
-- Never create notes in the vault root. Always use the appropriate subdirectory.
-- Use the existing directory structure. Do not create new top-level directories.
-- File names should be descriptive and use spaces: `Kubernetes Pod Security Standards.md`, not `k8s-pod-security.md`
-- When linking to hub notes, use the exact wiki-link names: `[[Work Projects Hub]]`, `[[Quarterly Hub]]`, `[[Home Lab Hub]]`
-- If a note on this topic already exists, tell the user and offer to update it instead of creating a duplicate
+- Never create notes in the vault root (only `_AGENT_MANIFEST.md` and `_ACTIVE_WORKSPACE.md` live there). Never create new top-level directories.
+- Use the existing directory structure and templates. Do not invent new formats.

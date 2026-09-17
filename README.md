@@ -44,6 +44,17 @@ Install only what you need. Each plugin is self-contained.
 claude mcp add obsidian --scope user -- npx @bitbonsai/mcpvault@latest /path/to/your/vault
 ```
 
+Since 2.1.0, webby expects the numbered vault layout:
+
+| Path | Holds |
+|------|-------|
+| `_AGENT_MANIFEST.md` | Agent rules for folders, naming, and frontmatter. Skills read this first. |
+| `00_Inbox/` | Unsorted capture |
+| `10_Daily/` | Daily notes, `YYYY-MM-DD.md` |
+| `20_Work/<project>/` | Work notes, flat per project (`knowledge/`, `meetings/`, ...) |
+| `30_Personal/` | Personal notes (`knowledge/`, `projects/`, ...) |
+| `80_System/Templates/` | Templater templates, including `Daily-Template.md` |
+
 **Writing style RAG** (optional, all plugins): Start [Qdrant](https://qdrant.tech/) on `localhost:6333` and install [mcp-server-qdrant](https://github.com/qdrant/mcp-server-qdrant). Store writing samples with the `qdrant-store` MCP tool.
 
 ## Skills
@@ -97,15 +108,15 @@ claude mcp add obsidian --scope user -- npx @bitbonsai/mcpvault@latest /path/to/
 
 | Skill | Description |
 |-------|-------------|
-| `/webby:daily` | Read today's daily note — surface todos and context |
-| `/webby:todo <add\|done\|pick>` | Manage todos — add items, mark done, or pick one |
-| `/webby:work` | Pick a daily todo and start working on it |
+| `/webby:daily` | Read today's daily note, surface todos and context |
+| `/webby:todo <add\|done> <item>` | Add a todo or mark one done |
+| `/webby:work [item]` | Pick a daily todo, log it as started, pull vault context, and begin |
 | `/webby:session-log [summary]` | Append session summary to today's daily note |
+| `/webby:standup [date]` | Recap the last session log, grouped by project |
+| `/webby:review [days]` | Weekly roll-up of daily logs into today's "A day in review" |
 | `/webby:vault-query <topic>` | Search vault for relevant context |
-| `/webby:vault-save <topic>` | File new knowledge into the vault |
+| `/webby:vault-save <topic>` | File new knowledge into the vault and link it from today's note |
 | `/webby:vault-setup [path]` | Configure MCPVault for cross-project vault access |
-| `/webby:kanban <action>` | Manage kanban board — add, move, done, list, reorder |
-| `/webby:kanban-log <task>` | Log activity to a kanban task note |
 
 ## Customization
 

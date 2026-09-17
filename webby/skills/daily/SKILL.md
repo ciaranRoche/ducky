@@ -1,6 +1,6 @@
 ---
 name: daily
-description: Read today's daily note from Obsidian — surface todos, context, and session
+description: Read today's daily note from Obsidian, surface todos, context, and session
   history. Use this to get oriented at the start of a session.
 allowed-tools:
   - mcp__obsidian__read_note
@@ -15,15 +15,15 @@ Read today's daily note from the Obsidian vault and present a concise summary of
 ## Behavior
 
 1. **Get today's date** using `date +%Y-%m-%d` via Bash
-2. **Read the daily note** at path `Daily/YYYY-MM-DD.md` using `mcp__obsidian__read_note`
-3. **If the note does not exist**, tell the user and offer to create it. Do not create it automatically.
+2. **Read the daily note** at path `10_Daily/YYYY-MM-DD.md` using `mcp__obsidian__read_note`
+3. **If the note does not exist**, tell the user and suggest `/webby:todo add <item>` (which creates it). Do not create it here.
 4. **Parse and present** the following sections:
 
 ### Sections to Surface
 
-- `#### To Dos` — present as **Open Items** (only unchecked `- [ ]` items, count them)
-- `#### Log` — present as **Session History** (what's already been logged today, if anything)
-- `#### Related Notes` — surface any linked projects, meetings, or learning notes
+- `#### To Dos`: present as **Open Items** (only unchecked `- [ ]` items, count them, skip the blank placeholder)
+- `#### Log`: present as **Session History** (what's already been logged today, if anything)
+- `#### Related Notes`: surface any wiki-links under Projects / Meetings / Learning
 
 ### Output Format
 
@@ -32,7 +32,7 @@ Present a clean, scannable summary. Do not dump the raw markdown. Example:
 ```
 ### Today (YYYY-MM-DD)
 
-**Open Items:** (X remaining)
+**Open Items:** (2 remaining)
 - [ ] Item 1
 - [ ] Item 2
 
@@ -43,22 +43,10 @@ Present a clean, scannable summary. Do not dump the raw markdown. Example:
 **Related:** [[Project Note]], [[Meeting Note]]
 ```
 
-If there are no items in a section, omit that section entirely.
-
-### Kanban Active Items
-
-After presenting the daily note sections, also read the kanban board at `Work/Kanban.md` using `mcp__obsidian__read_note`. If the board exists, parse the "In Progress" column (split content on `## ` headings, content before `%% kanban:settings`) and show active items:
-
-```
-**Kanban — Active:** (2 in progress)
-- [[DB Long Transactions]]
-- [[Design API spec]]
-```
-
-If the board does not exist or the "In Progress" column is empty, omit this section silently.
+If there are no items in a section, omit that section entirely. If there are open items, end with: `Run /webby:work to pick one.`
 
 ## Notes
 
-- The daily note path is always `Daily/YYYY-MM-DD.md` with no subdirectories
+- The daily note path is always `10_Daily/YYYY-MM-DD.md` with no subdirectories
 - Apply the ghostwriter skill for tone
-- Keep the output brief. The goal is orientation, not a full readout
+- Read-only. Keep the output brief, the goal is orientation, not a full readout

@@ -10,30 +10,53 @@
     {
       "name": "ducky",
       "source": "./ducky",
-      "description": "Rubber duck thinking companion — debugging, brainstorming, research, and Socratic questioning in your writing style",
+      "description": "Rubber duck thinking companion \u2014 debugging, brainstorming, research, and Socratic questioning in your writing style",
       "category": "productivity",
-      "keywords": ["pair-programming", "debugging", "brainstorming", "research", "writing-style"]
+      "keywords": [
+        "pair-programming",
+        "debugging",
+        "brainstorming",
+        "research",
+        "writing-style"
+      ]
     },
     {
       "name": "scrooge",
       "source": "./scrooge",
-      "description": "JIRA project management — ticket creation, triage, hygiene checks, sprint tracking, and estimation in your writing style",
+      "description": "JIRA project management \u2014 ticket creation, triage, hygiene checks, sprint tracking, and estimation in your writing style",
       "category": "productivity",
-      "keywords": ["jira", "project-management", "tickets", "sprint", "estimation"]
+      "keywords": [
+        "jira",
+        "project-management",
+        "tickets",
+        "sprint",
+        "estimation"
+      ]
     },
     {
       "name": "darkwing",
       "source": "./darkwing",
-      "description": "GitHub code ops — PR creation, structured code review pipeline, and issue management in your writing style",
+      "description": "GitHub code ops \u2014 PR creation, structured code review pipeline, and issue management in your writing style",
       "category": "productivity",
-      "keywords": ["github", "code-review", "pull-requests", "issues"]
+      "keywords": [
+        "github",
+        "code-review",
+        "pull-requests",
+        "issues"
+      ]
     },
     {
       "name": "webby",
       "source": "./webby",
-      "description": "Obsidian second brain — daily notes, session logging, vault search, and knowledge capture in your writing style",
+      "description": "Obsidian second brain, daily notes, todos, session logging, standup and weekly review, vault search, and knowledge capture in your writing style",
       "category": "productivity",
-      "keywords": ["obsidian", "vault", "second-brain", "knowledge-management", "daily-notes"]
+      "keywords": [
+        "obsidian",
+        "vault",
+        "second-brain",
+        "knowledge-management",
+        "daily-notes"
+      ]
     }
   ]
 }

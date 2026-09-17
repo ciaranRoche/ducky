@@ -19,7 +19,7 @@ Search the Obsidian vault for notes relevant to a topic and synthesize the findi
 2. **Search the vault** using `mcp__obsidian__search_notes` with `searchContent: true` and a reasonable limit (5-10 results)
 3. **Read the top results** using `mcp__obsidian__read_note` or `mcp__obsidian__read_multiple_notes` (batch, max 10) to get full content
 4. **Synthesize findings**:
-   - Group results by vault section (Work/Knowledge, Personal/Projects, Daily, etc.)
+   - Group results by vault section (`20_Work/<project>`, `20_Work/knowledge`, `30_Personal/projects`, `10_Daily`, etc.). Legacy `Work/` and `Personal/` folders may still hold results until migration is finished, so include them and label them as legacy.
    - Summarize the relevant content from each note
    - Use `[[Note Name]]` wiki-links for all referenced notes
    - Highlight connections between notes if any exist
@@ -32,10 +32,10 @@ Search the Obsidian vault for notes relevant to a topic and synthesize the findi
 
 Found X relevant notes.
 
-**[[Note Title]]** (Work/Knowledge/)
+**[[Note Title]]** (20_Work/knowledge/)
 Brief summary of the relevant content from this note.
 
-**[[Note Title]]** (Personal/Projects/)
+**[[Note Title]]** (30_Personal/projects/)
 Brief summary of the relevant content from this note.
 
 **Connections:**

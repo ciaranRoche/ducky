@@ -1,45 +1,44 @@
 ---
 name: todo
-description: Manage todos in today's daily note — add items, mark them done, or pick
-  one to focus on.
+description: Manage todos in today's daily note, add items or mark them done.
 allowed-tools:
   - mcp__obsidian__read_note
+  - mcp__obsidian__get_note_outline
   - mcp__obsidian__patch_note
   - mcp__obsidian__write_note
   - Bash
-argument-hint: 'add <item> | done <item> | pick'
+  - Read
+argument-hint: 'add <item> | done <item>'
 ---
 
 # Todo: Manage Daily Note Tasks
 
-Add, complete, and pick todos from today's daily note. All operations target the single todo section in the daily note template.
+Add and complete todos in today's daily note. To start working on one, use `/webby:work`.
 
 ## Section
 
-The daily note has one todo section:
-
-- `#### To Dos` — all tasks. Runs until `#### Log`. Managed by the Rollover Daily Todos plugin (rolls unchecked items forward between days). Adding and checking items is safe.
+The daily note has one todo section, `#### To Dos`, which runs until `#### Log`. The Rollover Daily Todos plugin copies unchecked items forward when a new daily note is created; it does not watch the file afterwards, so adding and checking items here is safe.
 
 ## Subcommands
 
-### `add <item>` — Add a todo
+### `add <item>`
 
 1. Get today's date via `date +%Y-%m-%d`
-2. Read `Daily/YYYY-MM-DD.md` via `mcp__obsidian__read_note`. If it doesn't exist, create it from the template (see Template section).
-3. Target section is always `#### To Dos`
+2. Read `10_Daily/YYYY-MM-DD.md` via `mcp__obsidian__read_note`. If it does not exist, create it (see Creating the daily note).
+3. Confirm `#### To Dos` exists via `mcp__obsidian__get_note_outline`. If it is missing, append the item to the end of the note with `write_note` `mode: "append"` and tell the user the note is not using the standard template.
 4. Extract the section content (from `#### To Dos` to `#### Log`)
-5. Append `- [ ] <item>` before the trailing blank `- [ ] ` placeholder if one exists, or after the last existing item
+5. Insert `- [ ] <item>` before the trailing blank `- [ ] ` placeholder if one exists, otherwise after the last existing item
 6. Patch via `mcp__obsidian__patch_note` with the exact old section as `oldString` and the updated section as `newString`
 
-**Sub-tasks:** If the argument uses `>` to indicate nesting, create indented sub-tasks:
-- Input: `add Disaster recovery > Who owns this?`
-- Result:
-  ```
-  - [ ] Disaster recovery
-  	- [ ] Who owns this?
-  ```
+**Sub-tasks:** `>` nests: `add Disaster recovery > Who owns this?` produces
+```
+- [ ] Disaster recovery
+	- [ ] Who owns this?
+```
 
-**Multiple items:** If the argument contains multiple items separated by commas or "and", add each as a separate `- [ ]` entry.
+**Multiple items:** comma or "and" separated arguments become separate `- [ ]` entries.
+
+**Wiki-links:** if the item names a vault note, keep the `[[link]]` in the todo text. `/webby:work` uses it to pull context.
 
 #### Patch Example
 
@@ -56,93 +55,37 @@ Adding "Review PR #55":
 - `oldString`: `#### To Dos\n- [ ] MCP debug server for Hyperfleet\n- [ ] \n\n#### Log`
 - `newString`: `#### To Dos\n- [ ] MCP debug server for Hyperfleet\n- [ ] Review PR #55\n- [ ] \n\n#### Log`
 
-#### Output
-
+Output:
 ```
 Added to To Dos:
 - [ ] Review PR #55
 ```
 
-### `done <item>` — Mark a todo as complete
+### `done <item>`
 
 1. Read today's daily note
-2. Search the todo section for unchecked items (`- [ ]`) matching the argument (case-insensitive, partial match is fine)
-3. If exactly one match: replace `- [ ]` with `- [x]` via `mcp__obsidian__patch_note`
-4. If multiple matches: list them numbered and ask the user which one
-5. If no match: tell the user and list the open items so they can try again
-6. When completing a parent item, also complete its indented sub-tasks
+2. Search `#### To Dos` for unchecked items matching the argument (case-insensitive, partial match is fine)
+3. Exactly one match: replace `- [ ]` with `- [x]` via `mcp__obsidian__patch_note`
+4. Multiple matches: list them numbered and ask which one
+5. No match: say so and list the open items
+6. Completing a parent item also completes its indented sub-tasks
 
-#### Patch Example
-
-Marking "MCP debug" as done:
-- `oldString`: `- [ ] MCP debug server for Hyperfleet`
-- `newString`: `- [x] MCP debug server for Hyperfleet`
-
-#### Output
-
+Output:
 ```
 Completed:
 - [x] MCP debug server for Hyperfleet
 ```
 
-### `pick` — Pick a task to focus on
+## Creating the daily note
 
-1. Read today's daily note
-2. Collect all unchecked `- [ ]` items from the todo section (skip blank placeholders)
-3. Present them as a numbered list:
-
-```
-### Open Tasks
-
-1. Disaster recovery
-2. MCP debug server for Hyperfleet
-3. Awesome Adapters :)
-4. Sync with Christine
-5. Sync with Michael
-6. Talk with Rafael
-
-Pick a number to start, or 0 to skip.
-```
-
-4. When the user picks one, log it to `#### Log` using the same patch pattern as session-log: `- Started: [item description]`
-
-## Template for New Daily Notes
-
-If the daily note does not exist, create it with pre-rendered content (replace date placeholders with actual values):
-
-```markdown
----
-date: YYYY-MM-DD
-type: daily
-tags:
-  - daily
----
-# DayOfWeek, Month D, YYYY
-
-#### To Dos
-- [ ] 
-
-#### Log
-- 
-
-#### A day in review
-
-#### Gratitude
-
-#### Related Notes
-- Projects: 
-- Meetings: 
-- Learning: 
-```
-
-Use Bash to compute the full date string: `date +"%A, %B %-d, %Y"`.
+If `10_Daily/YYYY-MM-DD.md` does not exist, read `${CLAUDE_PLUGIN_ROOT}/skills/_shared/daily-template.md`, replace `YYYY-MM-DD` with today's date and `DayOfWeek, Month D, YYYY` with the output of `date +"%A, %B %-d, %Y"`, then write it with `mcp__obsidian__write_note`. Do not inline the template here; the shared file is the single source of truth and must match the vault's `80_System/Templates/Daily-Template.md`.
 
 ## Fallback
 
-If `patch_note` fails, fall back to `mcp__obsidian__write_note` with `mode: "append"` and tell the user the entry was appended to the end of the file and may need manual repositioning.
+If `patch_note` fails, fall back to `mcp__obsidian__write_note` with `mode: "append"` and tell the user the entry was appended to the end of the file and needs manual repositioning.
 
 ## Notes
 
 - Apply the ghostwriter skill for tone in any output
-- Keep output concise. Confirm what was done, don't repeat the entire daily note
-- The blank `- [ ] ` placeholder at the end of the section is an Obsidian convention for easy manual entry. Preserve it when adding items (insert before it, not after)
+- Confirm what was done, don't repeat the entire daily note
+- The blank `- [ ] ` placeholder at the end of the section is an Obsidian convention for easy manual entry. Preserve it (insert before it, not after)
